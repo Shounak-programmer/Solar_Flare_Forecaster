@@ -71,7 +71,7 @@ STATIC = _find_static_dir()
 
 app = FastAPI(
     title="SuryaSetu: Aditya-L1 Solar Flare Forecaster",
-    description="Operational Solar Flare Forecasting and Nowcasting API for Aditya-L1 (PS-15)",
+    description="Operational Solar Flare Forecasting and Nowcasting API for Aditya-L1",
     version="1.0.0",
 )
 
