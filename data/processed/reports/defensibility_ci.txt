@@ -1,0 +1,14 @@
+DEFENSIBILITY — CI  (generated 2026-07-02 05:32 UTC)
+========================================================================
+A. BLOCK-BOOTSTRAP 95% CIs (resampling DAYS, 2000 resamples)
+   (respects within-day autocorrelation; forecast = 154 test days;
+    detection = 620 catalog days)
+   tss_15min                        point=0.3455   95% CI [0.3239, 0.3662]
+   tss_30min                        point=0.2291   95% CI [0.1995, 0.2592]
+   tss_60min                        point=0.2055   95% CI [0.1685, 0.2396]
+   ece_15min                        point=0.0061   95% CI [0.0027, 0.0112]
+   brier_15min                      point=0.0702   95% CI [0.0644, 0.0758]
+   far_15min                        point=0.8010   95% CI [0.7902, 0.8131]
+   detection_tss_catalog_aware      point=0.8404   95% CI [0.8259, 0.8543]
+   NOTE: 30/60-min CIs use the saved UNCALIBRATED test probabilities at
+   the val-tuned threshold (isotonic is monotonic; frozen table equal).

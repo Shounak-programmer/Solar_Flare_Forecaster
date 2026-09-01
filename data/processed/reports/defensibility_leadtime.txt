@@ -1,0 +1,25 @@
+DEFENSIBILITY — LEADTIME  (generated 2026-07-02 05:35 UTC)
+========================================================================
+B. LEAD-TIME DISTRIBUTION — TEST M/X flares (first threshold crossing
+   in [peak-60min, peak]; calibrated 15-min risk; Watch=0.0961,
+   Warning=0.2006; 'no coverage' = no in-GTI rows in [peak-15min, peak]
+   and no earlier crossing. Leads are CAPPED at the 60-min search window —
+   median 60 means risk was already elevated >=1 h before peak (active periods).
+   WATCH    MX: warned 101/140  median=60 min  IQR=[49,60]  range=[0,60]  no-warning=0  no-coverage=39
+   WATCH    M : warned 93/129  median=60 min  IQR=[51,60]  range=[0,60]  no-warning=0  no-coverage=36
+   WATCH    X : warned 8/11  median=50 min  IQR=[45,55]  range=[40,60]  no-warning=0  no-coverage=3
+   WARNING  MX: warned 99/140  median=48 min  IQR=[24,58]  range=[1,60]  no-warning=2  no-coverage=39
+   WARNING  M : warned 91/129  median=48 min  IQR=[23,58]  range=[1,60]  no-warning=2  no-coverage=36
+   WARNING  X : warned 8/11  median=48 min  IQR=[35,55]  range=[22,60]  no-warning=0  no-coverage=3
+   X-class detail:
+     2026-01-18 18:09  X1.9  watch_lead= 60.0  warning_lead= 60.0  
+     2026-02-01 12:33  X1.0  watch_lead=  nan  warning_lead=  nan  NO-COVERAGE
+     2026-02-01 23:57  X8.1  watch_lead= 47.0  warning_lead= 46.0  
+     2026-02-02 00:36  X2.8  watch_lead= 49.0  warning_lead= 49.0  
+     2026-02-02 08:14  X1.6  watch_lead= 53.0  warning_lead= 53.0  
+     2026-02-03 14:08  X1.5  watch_lead=  nan  warning_lead=  nan  NO-COVERAGE
+     2026-02-04 12:13  X4.2  watch_lead=  nan  warning_lead=  nan  NO-COVERAGE
+     2026-03-30 03:19  X1.4  watch_lead= 51.0  warning_lead= 27.0  
+     2026-04-24 01:07  X2.4  watch_lead= 40.0  warning_lead= 22.0  
+     2026-04-24 08:13  X2.5  watch_lead= 60.0  warning_lead= 60.0  
+     2026-06-03 11:28  X1.0  watch_lead= 40.0  warning_lead= 38.0  

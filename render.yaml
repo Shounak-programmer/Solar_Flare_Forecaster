@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: suryasetu
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements-deploy.txt
+    startCommand: uvicorn app.dashboard_server:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: DATA_DIR
+        value: dashboard_data
+      - key: MONGODB_DATABASE
+        value: suryasetu
+      - key: MONGODB_URI
+        sync: false

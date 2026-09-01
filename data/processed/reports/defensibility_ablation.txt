@@ -1,0 +1,12 @@
+DEFENSIBILITY — ABLATION  (generated 2026-07-02 05:40 UTC)
+========================================================================
+C. FUSION ABLATION — same XGBoost config + isotonic + val-tuned threshold
+   feature sets: solexs_only=19  hel1os_only=62  combined=87 (frozen system of record)
+   shared context in all sets: f107_lag1, sunspot_number_lag1, ar_count_lag1
+   combined-only (cross-detector / fused-catalog history): det_rate_1h, det_rate_3h, det_rate_6h, hardness_ddt_15m, hardness_ratio, last_det_n_detectors, last_det_peak_rate, neupert_resid, time_since_last_det_s
+   set               15min    30min    60min
+   solexs_only      0.2954   0.1811   0.0988
+   hel1os_only      0.2651   0.1705   0.1486
+   combined         0.3455   0.2288   0.2049
+   NOTE: new comparison table; the existing combined model and its frozen
+   numbers (0.346/0.229/0.205) remain the system of record.

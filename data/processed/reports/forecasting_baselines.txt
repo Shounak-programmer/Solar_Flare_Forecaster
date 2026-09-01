@@ -1,0 +1,62 @@
+STAGE 4b - BASELINES (time-respecting split)
+========================================================================
+train 20240701..20250630  val 20250701..20251231  test 20260101..20260613
+rows: train=444902 val=207986 test=210253
+
+TSS table (test set):
+  model             15min    30min    60min
+  climatology      0.0000   0.0000   0.0000
+  persistence      0.1621   0.1526   0.1609
+  logreg           0.2870   0.2031   0.1776
+  xgboost          0.3457   0.2291   0.2055
+
+Full metrics at 15-min (primary):
+  model              TSS     HSS     POD     FAR    prec
+  climatology      0.000   0.000   1.000   0.911   0.089
+  persistence      0.162   0.075   0.466   0.870   0.130
+  logreg           0.287   0.155   0.519   0.821   0.179
+  xgboost          0.346   0.190   0.565   0.799   0.201
+  (persistence cfg: det_rate_1h>=1.00)
+
+XGBoost feature importance (gain) - top 20:
+   1. soft_ddt_5m                      2797.4  [PHYSICS precursor]
+   2. hel1os_cdte2_std_5m              1260.7
+   3. hel1os_cdte2_max_5m              1235.7
+   4. neupert_resid                     676.8  [PHYSICS precursor]
+   5. hel1os_cdte1_std_5m               651.9
+   6. hel1os_cdte1_max_5m               509.9
+   7. soft_ddt_15m                      386.9  [PHYSICS precursor]
+   8. det_rate_6h                       375.2
+   9. det_rate_3h                       307.1
+  10. time_since_last_det_s             303.7
+  11. hel1os_cdte1_mean_30m             299.7
+  12. hel1os_cdte2_mean_60m             289.6
+  13. hel1os_hard_bgsub                 282.7  [PHYSICS precursor]
+  14. hel1os_cdte1_max_60m              277.1
+  15. solexs_sdd2_std_60m               262.8
+  16. ar_count_lag1                     260.3
+  17. solexs_sdd2_mean_60m              256.5
+  18. f107_lag1                         252.0
+  19. hel1os_cdte2_max_60m              243.4
+  20. hel1os_cdte1_mean_15m             237.9
+
+  precursor feature ranks (of 87 features):
+    hardness_ddt_15m             rank 41
+    hardness_ratio               rank 36
+    hel1os_hard_bgsub            rank 13
+    hel1os_hard_rate             rank 68
+    neupert_resid                rank 4
+    qpp_count_60m                rank 62
+    qpp_count_classic_60m        rank 84
+    qpp_count_intermediate_60m   rank 25
+    qpp_count_short_60m          rank 39
+    qpp_present_60m              rank 75
+    soft_ddt_15m                 rank 7
+    soft_ddt_30m                 rank 32
+    soft_ddt_5m                  rank 1
+
+XGBoost 15-min per-class recall (POD on pre-flare windows by class):
+  B: 601/2519 (0.24)
+  C: 8781/14666 (0.60)
+  M: 1114/1428 (0.78)
+  X: 98/121 (0.81)

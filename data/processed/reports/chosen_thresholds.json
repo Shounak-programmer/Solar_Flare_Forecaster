@@ -1,0 +1,22 @@
+{
+  "solexs_sdd2": {
+    "threshold": 3.5,
+    "tss": 0.8640395570053768
+  },
+  "hel1os_cdte1": {
+    "threshold": 2.0,
+    "tss": 0.6526832208565236
+  },
+  "hel1os_cdte2": {
+    "threshold": 2.0,
+    "tss": 0.5119441384917309
+  },
+  "hel1os_czt1": {
+    "threshold": 2.0,
+    "tss": 0.15096257437785937
+  },
+  "hel1os_czt2": {
+    "threshold": 2.0,
+    "tss": 0.14002182795541612
+  }
+}

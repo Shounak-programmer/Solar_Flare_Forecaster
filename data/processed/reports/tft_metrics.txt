@@ -1,0 +1,28 @@
+STAGE 4c - TFT (single run, device=cuda: NVIDIA GeForce RTX 5070 Ti, amp=bf16)
+============================================================
+params=39,939  lookback=60min  train_subsample=203500
+valid test sequences=201410 (XGBoost test rows=210253; TFT drops the first 59 min/day with no full 60-min lookback -> ~4% fewer points, same period)
+
+TSS (test), threshold tuned on val:
+  y_15min: TSS=0.2347 POD=0.408 FAR=0.812 HSS=0.153
+  y_30min: TSS=0.1787 POD=0.387 FAR=0.725 HSS=0.154
+  y_60min: TSS=0.1557 POD=0.362 FAR=0.564 HSS=0.164
+
+TFT variable-selection weights - top 15:
+   1. det_rate_1h                  0.3965
+   2. soft_ddt_5m                  0.2201
+   3. hardness_ddt_15m             0.0993
+   4. hel1os_cdte1_xcross_60m      0.0842
+   5. det_rate_6h                  0.0656
+   6. hel1os_cdte2_xcross_60m      0.0323
+   7. det_rate_3h                  0.0202
+   8. hel1os_czt2_max_5m           0.0182
+   9. last_det_peak_rate           0.0172
+  10. soft_ddt_15m                 0.0056
+  11. hardness_ratio               0.0050
+  12. time_since_last_det_s        0.0043
+  13. last_det_n_detectors         0.0038
+  14. neupert_resid                0.0034
+  15. hel1os_czt2_xcross_60m       0.0019
+
+MC-dropout mean uncertainty (test 15-min std): 0.0277

@@ -1,0 +1,27 @@
+{
+ "value": {
+  "base_rate": 0.0891,
+  "curves": {
+   "Watch (0.096)": {
+    "pod": 0.5654,
+    "pofd": 0.2197,
+    "vmax": 0.3457,
+    "cl_at_vmax": 0.0891,
+    "v_positive_range": [
+     0.052,
+     0.1985
+    ]
+   },
+   "Warning (0.20)": {
+    "pod": 0.3267,
+    "pofd": 0.0495,
+    "vmax": 0.2771,
+    "cl_at_vmax": 0.0891,
+    "v_positive_range": [
+     0.0655,
+     0.3908
+    ]
+   }
+  }
+ }
+}

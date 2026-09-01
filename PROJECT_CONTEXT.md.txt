@@ -1,0 +1,189 @@
+# PROJECT CONTEXT — ISRO Bharatiya Antariksh Hackathon 2026
+
+## Problem Statement
+
+PS-15: Forecasting and/or Nowcasting of Solar Flares using combined Soft- and Hard X-ray 
+data from Aditya-L1 (SoLEXS + HEL1OS).
+
+## Mentors / Judges
+
+- **Sarwade Abhilash Rajendra (URSC)** — Space Astronomy Group, URSC Bengaluru. 
+  Prime member of the SoLEXS team, co-author on the HEL1OS instrument paper (Solar Physics, 
+  Oct 2025). Built the instrument. Will detect any imprecise instrument vocabulary instantly.
+- **Srikar Paavan Tadepalli**
+- **Kiran L**
+
+Implication: use exact instrument terminology (CdTe 8–70 keV, CZT 20–150 keV, etc.), cite 
+HEL1OS paper (arXiv 2512.12679) and SoLEXS paper (Sankarasubramanian et al. 2017).
+
+## Mentor-Revealed Requirements (from explainer slides)
+
+The slides made explicit what the PDF only hinted at:
+
+1. **Independent detector pipelines** — Milestone 1 says SoLEXS and HEL1OS detection must be 
+   built independently, then fused into a unified master catalog (Milestone 2). NOT a joint 
+   black-box model.
+2. **QPP detection** — Quasi-Periodic Pulsations explicitly named on slides. Wavelet-based 
+   detection of 1s–5min oscillations in hard X-ray during flares. This is the differentiator 
+   almost no team will think to do.
+3. **Pre-flare precursor detection** — Slide 4 shows "Precursor Heating Detected" in red 
+   before the actual peak. Forecasting target is detection of soft X-ray gradient + hard X-ray 
+   emergence in 5–30 min window before impulsive phase.
+4. **15-minute forecast horizon** — explicitly shown in their example.
+5. **Multi-class B/C/M/X probabilities** — required, not optional.
+6. **Visual dashboard** — Slide 1 mock shows solar disk view + risk gauge + multi-band 
+   light curves + alert log. Match this design language.
+
+## Architecture (5 phases)
+
+```
+Phase 1: Unified Light Curves
+  Raw FITS (SoLEXS + HEL1OS) → daily Parquet on common UTC grid
+
+Phase 2: Labeled Dataset
+  Daily Parquet + flare catalog → per-second labels 
+  (is_flare, flare_class, time_to_peak, phase, precursor_window_30min)
+
+Phase 3: Nowcasting
+  5 independent detection pipelines:
+    - SoLEXS-SDD2
+    - HEL1OS-CdTe1, HEL1OS-CdTe2
+    - HEL1OS-CZT1, HEL1OS-CZT2
+  Each produces its own flare catalog.
+  Fusion layer produces Master Flare Catalog.
+  Separate QPP detection module (wavelet-based) on HEL1OS hard X-ray.
+
+Phase 4: Forecasting
+  Feature engineering on labeled dataset:
+    - Soft X-ray gradient (d/dt of GOES-equivalent band)
+    - Hardness ratio evolution (HEL1OS/SoLEXS)
+    - Hard X-ray background-subtracted rate
+    - Time since last flare
+    - F10.7, sunspot number, active region count covariates
+    - QPP presence flag in trailing window
+  Model: Temporal Fusion Transformer (TFT) with quantile outputs.
+  Multi-class heads for B/C/M/X.
+  Calibration via isotonic regression.
+
+Phase 5: Dashboard + Serving
+  FastAPI inference service.
+  Streamlit dashboard: light curves + risk gauge + alert log + flare catalog browser.
+  Live demo capability.
+```
+
+## Team
+
+- 4 members, mixed skills, mixed physics background
+- Stack: PyTorch, FastAPI, NVIDIA DGX A100 access
+- Designated physics liaison reads HEL1OS paper, SoLEXS paper, Fletcher 2011, 
+  Zimovets 2021 (QPPs) before finale
+
+## Data Inventory (all downloaded)
+
+### Aditya-L1 (input data)
+- Path: `D:/Data/HEL1OS` and `D:/Data/SoLEXUS`
+- HEL1OS: 1286 unique observations (after deduplication), Jul 2024 – Jun 2026, 
+  ~12 hr per zip. Each observation has CdTe1, CdTe2, CZT1, CZT2 detectors with 
+  pre-binned light curves in 5 energy bands each + event lists + GTI files.
+- SoLEXS: 841 unique observations, Feb 2024 – Jun 2026, daily zips. 
+  ONLY SDD2 has data (SDD1 is consistently empty across all observations).
+- 616 duplicate "(1)" zips have been removed.
+
+### Auxiliary data (in `D:/Data/data/`)
+| Dataset | Size | Notes |
+|---|---|---|
+| GOES-16 XRS 1-min | 121.5 MB, 431 files | sunpy Fido; partial 2024-02 to ~2026-04 |
+| SWPC flare catalog | 695 KB, 8132 rows | C:6339 M:1320 B:387 X:85 |
+| Full HEK catalog | 8.5 MB, 63267 rows | All FRM providers |
+| F10.7 daily | 101 KB, 2590 rows | LASP source |
+| Sunspot number | 17 KB, 851 rows | SILSO source |
+| NOAA SRS | 0.7 MB, 727 files | Active regions, raw text |
+
+Validation: GOES Oct 3 2024 X9.0 flare at 12:18 UT confirmed in 
+`data/validation_oct3_2024.png`.
+
+## Data Schema Reference
+
+### HEL1OS zip structure
+```
+HLS_YYYYMMDD_HHMMSS_DDDDDsec_lev1_VXYZ.zip
+└── HLS_.../ 
+    ├── events/evt.fits           (4 HDUs: CDTE1-EVENTS, CDTE2-EVENTS, CZT1-EVENTS, CZT2-EVENTS)
+    │                              Columns: mjd, hlsobt, currtemp, chn, ener, recnum, utc-isot
+    │                              (CZT adds: pix, offsetchn)
+    ├── cdte/
+    │   ├── lightcurve_cdte1.fits  (5 HDUs, one per energy band)
+    │   ├── lightcurve_cdte2.fits
+    │   ├── hel1os_cdte_spectra_cdte1.fits  (SPECTRUM HDU, 511 channels, 20s binning)
+    │   └── hel1os_cdte_spectra_cdte2.fits
+    ├── czt/
+    │   ├── lightcurve_czt1.fits
+    │   ├── lightcurve_czt2.fits
+    │   ├── hel1os_czt_spectra_czt1.fits  (341 channels)
+    │   └── hel1os_czt_spectra_czt2.fits
+    └── aux/
+        ├── gticdte1.fits, gticdte2.fits, gticzt1.fits, gticzt2.fits
+        └── hk.fits
+
+HEL1OS Light Curve Bands:
+  CdTe: 5-20, 20-30, 30-40, 40-60, 1.8-90 keV
+  CZT:  20-40, 40-60, 60-80, 80-150, 18-160 keV
+
+HEL1OS Light Curve Columns: MJD, ISOT, CTR (cts/sec), STAT_ERR
+HEL1OS GTI HDU name: GTI_CDTE1 / GTI_CDTE2 / GTI_CZT1 / GTI_CZT2
+HEL1OS GTI Columns: tstart, tstop (in MJD days)
+HEL1OS Time: utc-isot column already populated; mjd column gives MJD.
+```
+
+### SoLEXS zip structure
+```
+AL1_SLX_L1_YYYYMMDD_v1.0.zip
+└── AL1_SLX_L1_YYYYMMDD_v1.0/
+    ├── SDD1/  (empty — only contains an empty GTI file; SKIP)
+    └── SDD2/
+        ├── AL1_SOLEXS_YYYYMMDD_SDD2_L1.gti.gz   (GTI HDU, START/STOP in Unix epoch)
+        ├── AL1_SOLEXS_YYYYMMDD_SDD2_L1.lc.gz    (RATE HDU; columns: TIME, COUNTS)
+        └── AL1_SOLEXS_YYYYMMDD_SDD2_L1.pi.gz    (SPECTRUM HDU, 340 channels, 1s binning)
+
+SoLEXS Time: TIME column is Unix epoch seconds, TIMESYS=UTC, MJDREFI=40587.
+```
+
+### Versioning
+HEL1OS observations have version codes (V111, V112, V211, V311 etc.).
+134 timestamps have multiple versions. The loader picks the highest version per timestamp.
+
+## Current Phase
+
+**Phase 1 — IN PROGRESS**
+
+The loader code `src/data/loaders.py` and the daily builder 
+`scripts/01_build_daily_lightcurves.py` have been drafted (see code in PROJECT_CODE.md or 
+ask me for them). They need to be saved and run.
+
+Next concrete actions:
+1. Save `src/data/loaders.py`
+2. Save `scripts/01_build_daily_lightcurves.py`
+3. Run the daily builder; expect ~600 Parquet files in `data/processed/daily_lightcurves/`
+4. Run validation: plot Oct 3 2024 light curves and confirm X9.0 spike at 12:18 UT in 
+   SoLEXS, HEL1OS CdTe1, HEL1OS CZT1.
+
+After Phase 1 verification passes, proceed to Phase 2 (labeled-second dataset).
+
+## Working Constraints
+
+- Read FITS from inside zips using `BytesIO` — do NOT extract everything (would use 365 GB).
+- 73.7 GB of HEL1OS zips, 5.7 GB of SoLEXS zips already on disk.
+- DGX A100 available for model training in Phase 4.
+- Proposal due July 1 — Phases 1, 2, 3 must show preliminary results by then.
+- Finale August 6-7, 30 hours live build.
+
+## Strategic Differentiators
+
+What separates a winning submission from a competent one:
+
+1. **Independent 5-detector architecture** (not joint black-box) — matches Milestone 1 exactly
+2. **QPP detection module** — almost no other team will do this; novel scientific contribution
+3. **Neupert-effect-aware features** in the forecaster (hard X-rays as derivative of soft)
+4. **Calibrated uncertainty** in forecasts (quantile outputs, not single-point probabilities)
+5. **Pre-finale draft research note** signaling publication intent
+6. **Open-source Python package** (`aditya-flare`) for community use

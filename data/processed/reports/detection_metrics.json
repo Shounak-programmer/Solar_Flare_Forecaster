@@ -1,0 +1,85 @@
+{
+  "nowcast_grid": {
+    "bin_s": 360,
+    "n_bins": 143884,
+    "base_rate": 0.03803
+  },
+  "nowcast": {
+    "master": {
+      "pod": 0.809,
+      "far": 0.6647,
+      "tss": 0.7456,
+      "hss": 0.4442
+    },
+    "persistence_1bin": {
+      "pod": 0.0179,
+      "far": 0.982,
+      "tss": -0.0208,
+      "hss": -0.0208
+    },
+    "persistence_30min": {
+      "pod": 0.1818,
+      "far": 0.9606,
+      "tss": 0.0067,
+      "hss": 0.0024
+    },
+    "climatology": {
+      "pod": 0.038,
+      "far": 0.962,
+      "tss": -0.0,
+      "hss": -0.0
+    }
+  },
+  "event_level": {
+    "master_pod": 0.872,
+    "best_single_pod": 0.808,
+    "per_class": {
+      "B": [
+        116,
+        300
+      ],
+      "C": [
+        3791,
+        4301
+      ],
+      "M": [
+        837,
+        848
+      ],
+      "X": [
+        43,
+        43
+      ]
+    },
+    "catalog_aware": {
+      "pod": 0.872,
+      "far": 0.475,
+      "tss": 0.84,
+      "hss": 0.638
+    },
+    "strict": {
+      "pod": 0.872,
+      "far": 0.616,
+      "tss": 0.816,
+      "hss": 0.507
+    },
+    "confirmed": [
+      5175,
+      40.2
+    ],
+    "sub_threshold": [
+      3354,
+      26.1
+    ],
+    "candidate_novel": [
+      4329,
+      33.7
+    ]
+  },
+  "qpp_regime_flares": {
+    "classic": 119,
+    "intermediate": 54,
+    "short": 340
+  },
+  "framing": "NOWCASTING / DETECTION skill (concurrent), not forecasting."
+}

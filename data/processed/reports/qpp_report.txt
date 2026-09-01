@@ -1,0 +1,62 @@
+QPP DETECTION REPORT (Phase 3, Stage 5)
+========================================================================
+Method: HEL1OS CZT1/CZT2 hard X-ray over each master flare's [start, peak]
+impulsive window -> Savitzky-Golay envelope detrend -> complex-Morlet wavelet
+power -> Vaughan (2005) red-noise significance with a power-law + white-floor
+continuum (S(f)=A f^-beta + C) fitted by Whittle likelihood -> 95% global
+(number-of-frequencies-corrected) threshold. Search band 4-300 s.
+
+VALIDATION (synthetic sub-gate, must pass before real flares)
+------------------------------------------------------------------------
+- Injected 30 s sinusoid into flat+noise -> RECOVERED at 30.0 s (8.3 sigma).
+- Pure AR(1) phi=0.95 red-noise control -> 0 false QPPs.
+- Calibration over 200+ trials: red-noise false-positive rate 5.5%,
+  white-noise 6.0% (both ~ the nominal 5% for a 95% global test -> correctly
+  calibrated, NOT anti-conservative). Injection recovery 100% to amp/noise ~1.3.
+- A single power-law continuum initially produced 2 false QPPs on the red-noise
+  control (it cannot fit AR(1)'s bending spectrum); the white-floor term fixed
+  this. Plot: data/validation/gate5_qpp_synthetic.png
+
+RESULTS
+------------------------------------------------------------------------
+1,043 significant QPPs in 513 distinct flares (of 1,971 master flares with a
+CZT member). Period 4-294 s, median 7.6 s.
+
+Distinct flares by GOES class: X 10, M 113, C 99, non-SWPC 291.
+X-class: 10 of 30 CZT-observed X-flares show QPPs (33%); honest denominator is
+30 (only 30 of 43 X-class flares have a CZT member), not 43.
+
+Flagship X-class QPP: 2025-11-04 X1.8, CZT1, period 7.1 s, 5.9 sigma,
+sustained 129 coherent cycles (~15 min). Clearest overall: 2025-08-04, CZT2,
+7.8 s, 37.1 sigma, 40 cycles. Plot: data/validation/gate5_qpp_clearest.png
+
+REGIME TIERS (distinct flares / detections)
+------------------------------------------------------------------------
+  classic       (>=16 s): 119 flares / 164 detections   <- robustly solar
+  intermediate  (8-16 s):  54 flares / 118 detections
+  short         (4-8 s) : 340 flares / 761 detections   <- pending attribution
+  classic-tier by class: X 6, M 34, C 13, non-SWPC 68.
+
+INSTRUMENTAL CAVEAT (read before claiming solar attribution)
+------------------------------------------------------------------------
+73% of QPP detections fall in the 4-8 s "short" bin, near the 2 s Nyquist
+period of the 1 s-binned light curves. This population is STATISTICALLY REAL:
+red-noise false positives spread across periods (only 12% land at 4-8 s),
+whereas the real 4-8 s detections are sustained over a median of 59 coherent
+cycles -- photon/red noise cannot manufacture that.
+
+However, "not red noise" is NOT "confirmed solar." A ~7 s periodicity this
+prevalent must be cross-checked against known HEL1OS instrumental periodicities
+(telemetry cadence, detector readout, spacecraft spin/jitter) before solar
+attribution. The red-noise test cannot rule out a coherent instrumental signal.
+
+RECOMMENDATION
+------------------------------------------------------------------------
+- TIER 1 (lead with this): classic (>=16 s) QPPs + the X-class examples. These
+  sit in the established solar-QPP band (Inglis, Zimovets, Nakariakov) and are
+  unaffected by the cadence limit.
+- TIER 2 (report but flag): the 4-8 s "short" population as "statistically
+  coherent signal, pending cross-check against HEL1OS instrumental
+  periodicities before solar attribution."
+- Do NOT discard the short tier; carry it with the caveat via the `regime`
+  column in qpp_catalog.parquet.

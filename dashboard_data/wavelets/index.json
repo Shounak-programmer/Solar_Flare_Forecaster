@@ -1,0 +1,59 @@
+{
+  "featured": [
+    {
+      "id": "classic_x",
+      "date": "2025-11-04 17:34",
+      "detector": "hel1os_czt1",
+      "period_s": 21.3,
+      "significance": 3.4,
+      "n_cycles": 43.0,
+      "regime": "classic",
+      "tier_label": "classic \u226516 s \u2014 robustly solar",
+      "goes_class": "X"
+    },
+    {
+      "id": "featured_x",
+      "date": "2025-11-04 17:34",
+      "detector": "hel1os_czt1",
+      "period_s": 7.1,
+      "significance": 5.9,
+      "n_cycles": 129.0,
+      "regime": "short",
+      "tier_label": "short 4\u20138 s \u2014 pending instrumental cross-check (Inglis 2011)",
+      "goes_class": "X"
+    },
+    {
+      "id": "classic_1",
+      "date": "2026-01-19 18:13",
+      "detector": "hel1os_czt2",
+      "period_s": 21.3,
+      "significance": 37.1,
+      "n_cycles": 38.0,
+      "regime": "classic",
+      "tier_label": "classic \u226516 s \u2014 robustly solar",
+      "goes_class": null
+    },
+    {
+      "id": "classic_2",
+      "date": "2026-01-19 18:58",
+      "detector": "hel1os_czt1",
+      "period_s": 21.4,
+      "significance": 37.1,
+      "n_cycles": 74.0,
+      "regime": "classic",
+      "tier_label": "classic \u226516 s \u2014 robustly solar",
+      "goes_class": null
+    },
+    {
+      "id": "short_1",
+      "date": "2026-01-19 18:58",
+      "detector": "hel1os_czt2",
+      "period_s": 5.3,
+      "significance": 37.1,
+      "n_cycles": 297.0,
+      "regime": "short",
+      "tier_label": "short 4\u20138 s \u2014 pending instrumental cross-check (Inglis 2011)",
+      "goes_class": null
+    }
+  ]
+}

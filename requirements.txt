@@ -1,0 +1,30 @@
+# Aditya-L1 Solar Flare Forecasting & Nowcasting (PS-15) — minimal pinned deps.
+# Pins match the environment the frozen results were produced with.
+# Regenerated 2026-07-02: actual imports only (was a 129-package full freeze).
+
+# ── dashboard runtime (serves PRE-COMPUTED dashboard_data/ JSON; needs NOTHING
+#    else — no torch, no xgboost, no model code) ─────────────────────────────
+fastapi==0.135.3
+uvicorn==0.44.0
+
+# ── science / data-refresh pipeline (scripts/01–20: feature build, detection,
+#    QPP, forecasting, dashboard export) ─────────────────────────────────────
+numpy==2.2.6
+pandas==2.3.3
+pyarrow==24.0.0
+scipy==1.15.3
+scikit-learn==1.7.2
+xgboost==3.2.0
+PyWavelets==1.8.0
+astropy==6.1.7
+matplotlib==3.10.9
+
+# ── data download utilities (download_auxiliary.py, fix_remaining.py) ───────
+requests==2.34.2
+tqdm==4.67.3
+
+# ── OPTIONAL: TFT comparison only (scripts/17_train_tft.py; results frozen —
+#    not required for the dashboard or any refresh path). The frozen run used
+#    torch 2.11.0+cu128 (CUDA 12.8 wheel from download.pytorch.org); the plain
+#    PyPI CPU build is sufficient to re-run evaluation:
+# torch==2.11.0

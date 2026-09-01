@@ -1,0 +1,12 @@
+# build started 2026-06-18T11:50:11.280701Z  days=1
+20241001  rows=86400  detectors=['SoLEXS-SDD2', 'HEL1OS-CdTe1', 'HEL1OS-CdTe2', 'HEL1OS-CZT1', 'HEL1OS-CZT2']  build_time=0.59s
+
+# summary 2026-06-18T11:50:11.872425Z  built=1  skipped(existing)=0  failed=0  total_time=0.6s
+# build started 2026-06-18T11:50:12.893286Z  days=1
+20260201  rows=86400  detectors=['SoLEXS-SDD2', 'HEL1OS-CdTe1', 'HEL1OS-CdTe2', 'HEL1OS-CZT1', 'HEL1OS-CZT2']  build_time=0.30s
+
+# summary 2026-06-18T11:50:13.193322Z  built=1  skipped(existing)=0  failed=0  total_time=0.3s
+# build started 2026-06-18T11:50:14.205887Z  days=1
+20260202  rows=86400  detectors=['SoLEXS-SDD2', 'HEL1OS-CdTe1', 'HEL1OS-CdTe2', 'HEL1OS-CZT1', 'HEL1OS-CZT2']  build_time=0.35s
+
+# summary 2026-06-18T11:50:14.555933Z  built=1  skipped(existing)=0  failed=0  total_time=0.4s

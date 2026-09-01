@@ -1,0 +1,44 @@
+STAGE 6 - DETECTION METRICS vs BASELINES
+======================================================================
+per-bin nowcast grid: 360s bins, in-GTI only, N=143884 bins
+base rate (flare bins): 0.03803  (5472 positive bins)
+
+method             POD     FAR      TSS      HSS
+master               0.809   0.665   0.7456   0.4442
+persistence-1bin     0.018   0.982  -0.0208  -0.0208
+persistence-30min    0.182   0.961   0.0067   0.0024
+climatology          0.038   0.962  -0.0000  -0.0000
+
+master TSS (0.7456) beats best persistence (0.0067): YES (+0.7390)
+master TSS (0.7456) beats climatology (-0.0000): YES (+0.7456)
+>>> BEATS BOTH BASELINES: YES
+
+FRAMING (read before citing): this is NOWCASTING / DETECTION skill,
+not forecasting. The master detects CONCURRENT flares from live X-ray
+data and beats persistence + climatology at that task (the correct
+floor). It does NOT claim to beat an operational FORECASTER -- the
+master sees the present, a forecaster predicts the future. The
+like-for-like Camporeale (2025) comparison vs the NOAA operational
+forecast belongs to Phase 4 forecasting, not here.
+
+QPP catalogue regime tiers (distinct flares):
+  classic      : 119
+  intermediate : 54
+  short        : 340
+
+Event-level master metrics (member-aware, from GATE 4):
+  >>> MASTER POD = 0.872
+  >>> best single detector (solexs_sdd2, same denom) = 0.808
+  >>> PASS: master exceeds best single detector by +0.064
+  per-class master recall:
+  B: 116/300 (39%)
+  C: 3791/4301 (88%)
+  M: 837/848 (99%)
+  X: 43/43 (100%)
+  catalog-aware (candidate-novel = FP, per Sarwade):
+  POD=0.872 FAR=0.475 TSS=0.840 HSS=0.638
+  strict (all non-SWPC = FP):
+  POD=0.872 FAR=0.616 TSS=0.816 HSS=0.507
+  CONFIRMED (in SWPC):            5175  (40.2%)
+  SUB-THRESHOLD (HEK only):       3354  (26.1%)
+  CANDIDATE NOVEL (neither):      4329  (33.7%)

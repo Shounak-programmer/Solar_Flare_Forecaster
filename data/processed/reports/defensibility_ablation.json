@@ -1,0 +1,42 @@
+{
+ "ablation": {
+  "feature_counts": {
+   "solexs_only": 19,
+   "hel1os_only": 62,
+   "combined": 87
+  },
+  "context_in_all": [
+   "f107_lag1",
+   "sunspot_number_lag1",
+   "ar_count_lag1"
+  ],
+  "combined_only": [
+   "det_rate_1h",
+   "det_rate_3h",
+   "det_rate_6h",
+   "hardness_ddt_15m",
+   "hardness_ratio",
+   "last_det_n_detectors",
+   "last_det_peak_rate",
+   "neupert_resid",
+   "time_since_last_det_s"
+  ],
+  "tss": {
+   "solexs_only": {
+    "y_15min": 0.2954,
+    "y_30min": 0.1811,
+    "y_60min": 0.0988
+   },
+   "hel1os_only": {
+    "y_15min": 0.2651,
+    "y_30min": 0.1705,
+    "y_60min": 0.1486
+   },
+   "combined": {
+    "y_15min": 0.3455,
+    "y_30min": 0.2288,
+    "y_60min": 0.2049
+   }
+  }
+ }
+}

@@ -1,0 +1,42 @@
+GATE 3 - per-detector detection vs SWPC (all 620 days, +/-180s)
+==============================================================================
+
+solexs_sdd2  (events=7253, in-GTI SWPC flares=5212)
+  TP=4433 FP=2820 FN=779 TN=128504
+  POD=0.851  FAR=0.389  TSS=0.829  HSS=0.698
+  per-class recall: B:115/279  C:3517/4091  M:759/800  X:41/41
+
+hel1os_cdte1  (events=8807, in-GTI SWPC flares=5400)
+  TP=3211 FP=5596 FN=2189 TN=131050
+  POD=0.595  FAR=0.635  TSS=0.554  HSS=0.425
+  per-class recall: B:5/300  C:2400/4226  M:767/831  X:38/42
+
+hel1os_cdte2  (events=6819, in-GTI SWPC flares=5400)
+  TP=2690 FP=4129 FN=2710 TN=132517
+  POD=0.498  FAR=0.606  TSS=0.468  HSS=0.415
+  per-class recall: B:8/300  C:1949/4226  M:693/831  X:39/42
+
+hel1os_czt1  (events=1730, in-GTI SWPC flares=5254)
+  TP=613 FP=1117 FN=4641 TN=131734
+  POD=0.117  FAR=0.646  TSS=0.108  HSS=0.160
+  per-class recall: B:0/292  C:289/4103  M:299/816  X:25/42
+
+hel1os_czt2  (events=1660, in-GTI SWPC flares=5400)
+  TP=576 FP=1084 FN=4824 TN=135562
+  POD=0.107  FAR=0.653  TSS=0.099  HSS=0.148
+  per-class recall: B:0/300  C:269/4226  M:286/831  X:21/42
+
+5-DETECTOR x 4-CLASS recall table (caught / in-GTI total)
+  detector                  B            C            M            X
+  solexs_sdd2    115/279 (41%) 3517/4091 (86%) 759/800 (95%) 41/41 (100%)
+  hel1os_cdte1     5/300 (2%) 2400/4226 (57%) 767/831 (92%)  38/42 (90%)
+  hel1os_cdte2     8/300 (3%) 1949/4226 (46%) 693/831 (83%)  39/42 (93%)
+  hel1os_czt1      0/292 (0%) 289/4103 (7%) 299/816 (37%)  25/42 (60%)
+  hel1os_czt2      0/300 (0%) 269/4226 (6%) 286/831 (34%)  21/42 (50%)
+
+Hardness check (X-recall vs C-recall):
+  solexs_sdd2    X=1.00  C=0.86  X/C=1.2x
+  hel1os_cdte1   X=0.90  C=0.57  X/C=1.6x
+  hel1os_cdte2   X=0.93  C=0.46  X/C=2.0x
+  hel1os_czt1    X=0.60  C=0.07  X/C=8.5x
+  hel1os_czt2    X=0.50  C=0.06  X/C=7.9x

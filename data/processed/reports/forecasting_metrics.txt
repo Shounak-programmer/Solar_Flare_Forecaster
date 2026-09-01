@@ -1,0 +1,39 @@
+STAGE 4d - CALIBRATION + FINAL EVALUATION (XGBoost primary)
+========================================================================
+train 20240701..20250630 | val 20250701..20251231 | test 20260101..20260613
+rows: train=444902 val=207986 test=210253
+
+FINAL TSS table (test) - calibrated XGBoost vs baselines:
+  horizon      clim  persist  XGB(cal)
+  y_15min     0.000    0.162     0.346
+  y_30min     0.000    0.153     0.229
+  y_60min     0.000    0.161     0.205
+
+15-min full metrics (calibrated XGBoost):
+  TSS=0.346 HSS=0.188 POD=0.570 FAR=0.801 precision=0.199
+
+Calibration (test) before -> after isotonic:
+  y_15min: Brier 0.1936 -> 0.0702   ECE 0.3398 -> 0.0061   TSS 0.346 -> 0.346 (monotonic, preserved)
+  y_30min: Brier 0.2138 -> 0.1286   ECE 0.2871 -> 0.0106   TSS 0.229 -> 0.229 (monotonic, preserved)
+  y_60min: Brier 0.2259 -> 0.1983   ECE 0.1643 -> 0.0102   TSS 0.206 -> 0.205 (monotonic, preserved)
+
+Per-class recall, calibrated 15-min (POD on pre-flare windows; X denom=test events):
+  B: 612/2519 (0.24)
+  C: 8846/14666 (0.60)
+  M: 1122/1428 (0.79)
+  X: 98/121 (0.81)
+
+QUIET->X-CLASS ALL-CLEAR TEST (test set; 11 X-flares; quiet = no M/X in prior 12h):
+  quiet->X transitions in test: 2; flagged before peak: 2/2
+  ALL test X-flares flagged in [peak-15min,peak]: 8/11 (3 had no in-GTI feature rows in the pre-peak window)
+    2026-01-18 18:09  X1.9 [QUIET->X] priorMX_12h=0 flagged=YES lead=15min
+    2026-02-01 12:33  X1.0 [active  ] priorMX_12h=6 flagged=no lead=- NO-COVERAGE
+    2026-02-01 23:57  X8.1 [active  ] priorMX_12h=13 flagged=YES lead=10min
+    2026-02-02 00:36  X2.8 [active  ] priorMX_12h=13 flagged=YES lead=15min
+    2026-02-02 08:14  X1.6 [active  ] priorMX_12h=10 flagged=YES lead=15min
+    2026-02-03 14:08  X1.5 [active  ] priorMX_12h=5 flagged=no lead=- NO-COVERAGE
+    2026-02-04 12:13  X4.2 [active  ] priorMX_12h=7 flagged=no lead=- NO-COVERAGE
+    2026-03-30 03:19  X1.4 [QUIET->X] priorMX_12h=0 flagged=YES lead=15min
+    2026-04-24 01:07  X2.4 [active  ] priorMX_12h=2 flagged=YES lead=12min
+    2026-04-24 08:13  X2.5 [active  ] priorMX_12h=1 flagged=YES lead=15min
+    2026-06-03 11:28  X1.0 [active  ] priorMX_12h=2 flagged=YES lead=15min

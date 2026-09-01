@@ -1,0 +1,75 @@
+# Environment & secrets
+.env
+.env.local
+.env.*.local
+
+# Python virtual environments & caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+ENV/
+env/
+
+# Large raw science data & archive files
+data/raw/
+data/HEL1OS/
+data/SoLEXS/
+data/SoLEXUS/
+*.fits
+*.fits.gz
+*.zip
+*.tar
+*.tar.gz
+*.h5
+*.hdf5
+
+# Processed large data (regeneratable)
+data/processed/daily_lightcurves/*.parquet
+data/processed/labeled_seconds/*.parquet
+data/processed/detections/*.parquet
+data/processed/goes_xrs_combined.parquet
+data/processed/forecast_features/*.parquet
+data/processed/forecasts/*.npz
+data/processed/_old_backup/
+
+# Raw / intermediate download caches
+data/active_regions/
+data/goes/
+data/hek/
+data/indices/
+
+# PyTorch / ML Model weights
+*.pt
+*.pth
+*.ckpt
+*.bin
+*.onnx
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Operating system artifacts
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Build & packaging artifacts
+*.egg-info/
+dist/
+build/
+
+# Local assistant & agent settings
+.claude/
+.agents/
+

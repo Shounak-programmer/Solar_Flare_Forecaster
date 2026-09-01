@@ -1,0 +1,32 @@
+{
+  "days": 496,
+  "total_seconds": 42854400,
+  "flare_seconds": 5472758,
+  "quiet_seconds": 37381642,
+  "class_seconds": {
+    "B": 180671,
+    "C": 3952352,
+    "M": 1263916,
+    "X": 74918
+  },
+  "class_events": {
+    "B": 213,
+    "C": 3503,
+    "M": 818,
+    "X": 39
+  },
+  "phase_seconds": {
+    "quiet": 30854230,
+    "pre": 6527412,
+    "rise": 2750362,
+    "peak": 277855,
+    "decay": 2444541
+  },
+  "forecast_pos": {
+    "15min": 4029360,
+    "30min": 7649673,
+    "60min": 13746240
+  },
+  "unique_flare_ids_observed_in_labels": 4550,
+  "total_swpc_events_in_window": 4574
+}

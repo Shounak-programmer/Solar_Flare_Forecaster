@@ -1,0 +1,74 @@
+========================================================================
+(1) MANUAL SOURCE-ROW TRACE — prove no row with utc > t was used
+========================================================================
+
+  t = 2025-10-26 21:00:00+00:00  (day 20251026, row 1260)
+    solexs_sdd2_mean_60m: stored=4.3168  manual[t-60m,t]=4.3168  match=True
+    rows with utc > t available in source: 10799 (used by feature: 0 by construction — window is [t-W, t])
+    last master detection peak <= t: 2025-10-26 05:29:24+00:00 (<= t: True)  time_since_last_det_s stored=55836.0
+    f107_lag1 stored=126.43333333333334  (uses day 20251026 minus 1; same-day value never read)
+
+  t = 2024-08-26 05:06:00+00:00  (day 20240826, row 306)
+    solexs_sdd2_mean_60m: stored=93.8808  manual[t-60m,t]=93.8808  match=True
+    rows with utc > t available in source: 68039 (used by feature: 0 by construction — window is [t-W, t])
+    last master detection peak <= t: 2024-08-26 03:05:02+00:00 (<= t: True)  time_since_last_det_s stored=7258.0
+    f107_lag1 stored=231.16666666666666  (uses day 20240826 minus 1; same-day value never read)
+
+  t = 2026-01-14 17:41:00+00:00  (day 20260114, row 1061)
+    solexs_sdd2_mean_60m: stored=17.9161  manual[t-60m,t]=17.9161  match=True
+    rows with utc > t available in source: 22739 (used by feature: 0 by construction — window is [t-W, t])
+    last master detection peak <= t: 2026-01-14 16:17:03+00:00 (<= t: True)  time_since_last_det_s stored=5037.0
+    f107_lag1 stored=117.63333333333333  (uses day 20260114 minus 1; same-day value never read)
+
+========================================================================
+(2) +1-STEP SHIFT TEST — features must change as t advances
+========================================================================
+  features evaluated: 86
+  features that change across consecutive t (active window): 59 > 50%, 78 > 0%
+  near-constant features: 8  (expected-static daily/QPP context: 8)
+  UNEXPECTED static features (investigate if non-empty): []
+
+loading full feature matrix ...
+
+========================================================================
+(3) SHAPE / TARGET RATES / FEATURE-TARGET CORRELATIONS
+========================================================================
+  feature matrix shape: (892800, 93)  (86 features)
+  rows in-GTI (>=1 detector): 863141 (96.7%)
+
+  Target positive rates (all rows) vs Phase 2 reference:
+    y_15min: 0.0939   (Phase 2: 0.0940)
+    y_30min: 0.1781   (Phase 2: 0.1790)
+    y_60min: 0.3203   (Phase 2: 0.3210)
+  multi-class y_class30 distribution:
+    {'nan': 0.8219, 'C': 0.1385, 'M': 0.0287, 'B': 0.0093, 'X': 0.0016}
+
+  |corr| of each feature with y_15min (top 15) — FLAG if > 0.9:
+    0.086  det_rate_6h
+    0.079  soft_ddt_5m
+    0.077  det_rate_1h
+    0.076  det_rate_3h
+    0.066  soft_ddt_15m
+    0.058  hardness_ddt_15m
+    0.058  solexs_sdd2_xcross_60m
+    0.056  hel1os_cdte1_xcross_60m
+    0.054  soft_ddt_30m
+    0.054  hel1os_cdte2_xcross_60m
+    0.052  time_since_last_det_s
+    0.045  hel1os_cdte1_max_5m
+    0.042  hel1os_hard_bgsub
+    0.040  hel1os_cdte1_std_5m
+    0.040  f107_lag1
+
+  features with |corr| > 0.9 to y_15min: 0 (NONE — good)
+
+========================================================================
+(4) GTI GAPS -> NaN FEATURES (no interpolation across gaps)
+========================================================================
+  hel1os_czt1_mean_5m NaN rows: 64795 (7.3%) — these are out-of-GTI / gap-spanning windows
+  rows with mean NaN but std finite (interpolation bug): 0 (NONE — correct)
+  overall feature NaN fraction: 5.49%
+
+========================================================================
+GATE A VERDICT: PASS (no feature trivially predicts the target; trailing-only confirmed)
+========================================================================

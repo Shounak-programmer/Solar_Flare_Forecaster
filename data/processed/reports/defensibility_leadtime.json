@@ -1,0 +1,120 @@
+{
+ "leadtime": {
+  "watch": {
+   "n": 140,
+   "warned": 101,
+   "median_min": 60.0,
+   "iqr": [
+    49.0,
+    60.0
+   ],
+   "min": 0.0,
+   "max": 60.0,
+   "no_warning": 0,
+   "no_coverage": 39
+  },
+  "warning": {
+   "n": 140,
+   "warned": 99,
+   "median_min": 48.0,
+   "iqr": [
+    24.5,
+    57.5
+   ],
+   "min": 1.0,
+   "max": 60.0,
+   "no_warning": 2,
+   "no_coverage": 39
+  },
+  "x_detail": [
+   {
+    "peak_utc": "2026-01-18 18:09",
+    "goes_class": "X1.9",
+    "letter": "X",
+    "coverage": true,
+    "lead_watch_min": 60.0,
+    "lead_warning_min": 60.0
+   },
+   {
+    "peak_utc": "2026-02-01 12:33",
+    "goes_class": "X1.0",
+    "letter": "X",
+    "coverage": false,
+    "lead_watch_min": null,
+    "lead_warning_min": null
+   },
+   {
+    "peak_utc": "2026-02-01 23:57",
+    "goes_class": "X8.1",
+    "letter": "X",
+    "coverage": true,
+    "lead_watch_min": 47.0,
+    "lead_warning_min": 46.0
+   },
+   {
+    "peak_utc": "2026-02-02 00:36",
+    "goes_class": "X2.8",
+    "letter": "X",
+    "coverage": true,
+    "lead_watch_min": 49.0,
+    "lead_warning_min": 49.0
+   },
+   {
+    "peak_utc": "2026-02-02 08:14",
+    "goes_class": "X1.6",
+    "letter": "X",
+    "coverage": true,
+    "lead_watch_min": 53.0,
+    "lead_warning_min": 53.0
+   },
+   {
+    "peak_utc": "2026-02-03 14:08",
+    "goes_class": "X1.5",
+    "letter": "X",
+    "coverage": false,
+    "lead_watch_min": null,
+    "lead_warning_min": null
+   },
+   {
+    "peak_utc": "2026-02-04 12:13",
+    "goes_class": "X4.2",
+    "letter": "X",
+    "coverage": false,
+    "lead_watch_min": null,
+    "lead_warning_min": null
+   },
+   {
+    "peak_utc": "2026-03-30 03:19",
+    "goes_class": "X1.4",
+    "letter": "X",
+    "coverage": true,
+    "lead_watch_min": 51.0,
+    "lead_warning_min": 27.0
+   },
+   {
+    "peak_utc": "2026-04-24 01:07",
+    "goes_class": "X2.4",
+    "letter": "X",
+    "coverage": true,
+    "lead_watch_min": 40.0,
+    "lead_warning_min": 22.0
+   },
+   {
+    "peak_utc": "2026-04-24 08:13",
+    "goes_class": "X2.5",
+    "letter": "X",
+    "coverage": true,
+    "lead_watch_min": 60.0,
+    "lead_warning_min": 60.0
+   },
+   {
+    "peak_utc": "2026-06-03 11:28",
+    "goes_class": "X1.0",
+    "letter": "X",
+    "coverage": true,
+    "lead_watch_min": 40.0,
+    "lead_warning_min": 38.0
+   }
+  ]
+ }
+}

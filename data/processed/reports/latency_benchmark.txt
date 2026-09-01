@@ -1,0 +1,17 @@
+CPU INFERENCE LATENCY BENCHMARK — 15-min calibrated forecast
+====================================================================
+path: 1x87 float32 feature vector -> XGBoost predict_proba -> isotonic
+model: frozen Stage-4d config (400 trees cap, best_iteration=61), tree_method=hist, single-thread single-row inference
+hardware: CPU only (no GPU used at inference)
+calls: 10000 (after 200-call warm-up)
+
+  median latency : 0.198 ms
+  mean latency   : 0.219 ms
+  p99 latency    : 0.414 ms
+  throughput     : 5,058 forecasts/s (single thread)
+
+  model footprint: booster serialized 424 KB · pickled sklearn wrapper 428 KB · isotonic 3.5 KB
+
+Interpretation: sub-10-ms single-row CPU inference — negligible against the
+1-minute forecast cadence and instrument telemetry latency; the system is
+operationally real-time on commodity hardware.

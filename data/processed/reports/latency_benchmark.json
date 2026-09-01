@@ -1,0 +1,11 @@
+{
+ "median_ms": 0.198,
+ "mean_ms": 0.219,
+ "p99_ms": 0.414,
+ "throughput_per_s": 5058,
+ "n_calls": 10000,
+ "booster_bytes": 433801,
+ "pickle_bytes": 438065,
+ "isotonic_bytes": 3614,
+ "best_iteration": 61
+}

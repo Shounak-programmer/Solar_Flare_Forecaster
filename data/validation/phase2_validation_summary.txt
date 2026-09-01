@@ -1,0 +1,32 @@
+I:\Solar Flare ISRO\scripts\07_validate_labels.py:141: UserWarning: No artists with labels found to put in legend.  Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
+  ax.legend(loc="upper right")
+[PASS] 20241003 X9.0 peak=2024-10-03T12:18:00+00:00
+    plot: I:\Solar Flare ISRO\data\validation\labels_20241003.png
+[PASS] 20241001 X7.1 peak=2024-10-01T22:20:00+00:00
+    plot: I:\Solar Flare ISRO\data\validation\labels_20241001.png
+[PASS] 20260201 X8.1 peak=2026-02-01T23:57:00+00:00
+    plot: I:\Solar Flare ISRO\data\validation\labels_20260201.png
+
+Class distribution for 20241003 (whole day, 86400 sec):
+       class    seconds  percent
+       quiet      75350   87.21%
+           B          0    0.00%
+           C       1082    1.25%
+           M       8827   10.22%
+           X       1141    1.32%
+
+Phase distribution for 20241003:
+       quiet      57350   66.38%
+         pre      18000   20.83%
+        rise       5670    6.56%
+        peak        671    0.78%
+       decay       4709    5.45%
+
+Overall: PASS
+
+# Sanity check appended 2026-06-19T13:43:31.270394Z
+# 3 random labeled days picked by seed=20260619:
+#   QUIET    20241021  -> 100.00% quiet, 0 flares, GOES coverage OK
+#   MODERATE 20250902  -> 96.04% quiet, 4 C-class events, 244 peak-sec (4*61) OK
+#   X-CLASS  20250103  -> 81.86% quiet, 11 events including X, 671 peak-sec (11*61) OK
+# Conclusion: no silent corruption from parallel workers.
