@@ -1,0 +1,780 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aditya-L1 Solar Flare Forecaster — PS-15</title>
+<link rel="stylesheet" href="/css/style.css">
+<script src="/vendor/plotly-2.35.2.min.js" charset="utf-8"></script>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">☀</div>
+    <div>
+      <div class="title">Aditya-L1 Solar Flare Forecaster</div>
+      <div class="subtitle">SIH 2026: Forecasting and/or Nowcasting of Solar Flares using combined Soft and Hard X-ray data from Aditya-L1 PS:26209</div>
+    </div>
+  </div>
+  <nav class="tabs">
+    <button class="tab active" data-tab="replay">Replay</button>
+    <button class="tab" data-tab="performance">Performance</button>
+    <button class="tab" data-tab="operations">Operations</button>
+    <button class="tab" data-tab="catalog">Catalog &amp; Science</button>
+  </nav>
+</header>
+
+<main id="tab-replay" class="tabpane active">
+  <section class="row daybar">
+    <div class="dayselect">
+      <label>Demo day</label>
+      <select id="daySelect"></select>
+    </div>
+    <div id="dayMeta" class="daymeta"></div>
+    <div id="splitBadge" class="badge"></div>
+  </section>
+
+  <section id="alertBanner" class="alert-banner quiet">
+    <div class="alert-state" id="alertState">QUIET</div>
+    <div class="alert-desc" id="alertDesc">Nominal — low flare risk</div>
+    <div class="alert-clock" id="playClock">--:-- UT</div>
+  </section>
+
+  <div class="row main-grid">
+    <section class="card forecast-card">
+      <div class="card-h">Calibrated Risk — next 15 min <span class="hint">(probability, not certainty)</span></div>
+      <div id="riskBig" class="risk-big">--</div>
+      <div class="risk-band" id="riskBand">band: -- – --</div>
+      <div class="gauge">
+        <div class="gauge-fill" id="gaugeFill"></div>
+        <div class="gauge-tick watch" id="tickWatch" title="Watch threshold"></div>
+        <div class="gauge-tick warn" id="tickWarn" title="Warning threshold"></div>
+      </div>
+      <div class="gauge-legend"><span class="dot watch"></span>Watch&nbsp;&nbsp;<span class="dot warn"></span>Warning</div>
+      <div class="risk-secondary">
+        <div><span>30 min</span><b id="risk30">--</b></div>
+        <div><span>60 min</span><b id="risk60">--</b></div>
+      </div>
+      <div id="leadCallout" class="lead-callout"></div>
+    </section>
+
+    <section class="card chart-card">
+      <div class="card-h">Detector light curves
+        <span class="hint" id="revealHint">— revealing only data ≤ playback time (causal: uses no future data)</span></div>
+      <div id="mainChart" class="chart"></div>
+    </section>
+  </div>
+
+  <section class="row controls">
+    <button id="playBtn" class="btn primary">▶ Play</button>
+    <button id="restartBtn" class="btn">⟲ Restart</button>
+    <div class="speeds">
+      <span>Speed</span>
+      <button class="spd" data-spd="60">60×</button>
+      <button class="spd active" data-spd="300">300×</button>
+      <button class="spd" data-spd="600">600×</button>
+    </div>
+    <input type="range" id="scrubber" class="scrubber" min="0" max="1439" value="0">
+    <div id="scrubLabel" class="scrub-label">00:00 UT</div>
+  </section>
+
+  <section class="card impact-card" id="impactCard">
+    <div class="card-h">Operational impact</div>
+    <div id="impactText" class="impact-text">—</div>
+  </section>
+</main>
+
+<main id="tab-performance" class="tabpane">
+  <section class="perf-intro card">
+    <div class="card-h">Forecasting performance — held-out test (2026-01 → 2026-06)</div>
+    <p class="perf-lead">A true <b>forecasting</b> result (15-minute prediction lead), evaluated on data the model never saw.
+    The bar to clear is the operational baselines that <b>Camporeale (2025)</b> found the official NOAA forecast struggles to beat — we beat them.
+    Detection (TSS 0.84) is shown separately and labelled <b>nowcasting</b> (concurrent, not prediction).</p>
+  </section>
+
+  <div class="perf-grid">
+    <section class="card">
+      <div class="card-h">Reliability diagram — calibration is a feature <span class="hint">· held-out TEST</span></div>
+      <div id="relChart" class="chart sm"></div>
+      <div class="metric-cap" id="relCap">—</div>
+    </section>
+    <section class="card">
+      <div class="card-h">Skill (TSS) vs operational baselines <span class="hint">· held-out TEST</span></div>
+      <div id="tssChart" class="chart sm"></div>
+      <div class="metric-cap" id="tssCap">—</div>
+    </section>
+  </div>
+
+  <div class="perf-grid">
+    <section class="card">
+      <div class="card-h">Feature importance — what actually predicts <span class="hint">· model gain (train)</span></div>
+      <div id="impChart" class="chart sm"></div>
+      <div class="metric-cap">Physics precursors in <span class=" accent">orange</span>. Cross-model agreement: XGBoost (#1 soft_ddt) and the TFT (#2 soft_ddt) independently rank the soft X-ray derivative top-2 — the signal is physical, not model-specific.</div>
+    </section>
+    <section class="card">
+      <div class="card-h">Per-class &amp; all-clear (Camporeale failure mode) <span class="hint">· held-out TEST</span></div>
+      <table class="pclass-table" id="pclassTable"></table>
+      <div id="allClear" class="allclear"></div>
+    </section>
+  </div>
+</main>
+<main id="tab-operations" class="tabpane">
+  <section class="ops-statusbar card">
+    <div class="ops-select">
+      <label>Console feed</label>
+      <select id="opsDaySelect"></select>
+    </div>
+    <div class="ops-now">NOW <b id="opsClock">--:-- UT</b></div>
+    <div class="ops-status">
+      <span class="stat"><i class="led" id="ledDet"></i><span id="opsDetOnline">–/5</span> detectors</span>
+      <span class="stat">coverage <b id="opsCoverage">–</b></span>
+      <span class="stat">last update <b id="opsUpdate">–</b></span>
+    </div>
+  </section>
+
+  <div class="ops-grid">
+    <section class="card ops-alert">
+      <div class="card-h">Forecast status</div>
+      <div id="opsAlertState" class="ops-alert-state">—</div>
+      <div class="ops-risk-row">
+        <div class="ops-risk-main"><span>next 15 min</span><b id="opsRisk15">—</b></div>
+        <div class="ops-risk-band" id="opsBand">band —</div>
+      </div>
+      <div class="ops-risk-sub">
+        <div><span>30 min</span><b id="opsRisk30">—</b></div>
+        <div><span>60 min</span><b id="opsRisk60">—</b></div>
+      </div>
+    </section>
+
+    <section class="card ops-chart-card">
+      <div class="card-h">Detector feed <span class="hint">— trailing 3 h to NOW</span></div>
+      <div id="opsChart" class="chart"></div>
+    </section>
+
+    <section class="card ops-context">
+      <div class="card-h">Solar context (as of NOW)</div>
+      <ul class="ctx-list">
+        <li><span>Hardness ratio <i>(HEL1OS/SoLEXS)</i></span><b id="ctxHard">—</b></li>
+        <li><span>Neupert residual</span><b id="ctxNeu">—</b></li>
+        <li><span>Time since last flare</span><b id="ctxTSL">—</b></li>
+        <li><span>F10.7 flux <i>(SFU)</i></span><b id="ctxF107">—</b></li>
+        <li><span>Sunspot number</span><b id="ctxSSN">—</b></li>
+        <li><span>Active regions</span><b id="ctxAR">—</b></li>
+      </ul>
+    </section>
+  </div>
+
+  <section class="card ops-impact" id="opsImpactCard">
+    <div class="card-h">Operational impact</div>
+    <div id="opsImpact" class="impact-text">—</div>
+  </section>
+
+  <section class="row controls ops-controls">
+    <span class="ops-ctrl-label">NOW</span>
+    <input type="range" id="opsScrub" class="scrubber" min="0" max="1439" value="0">
+    <div id="opsScrubLabel" class="scrub-label">00:00 UT</div>
+  </section>
+</main>
+<main id="tab-catalog" class="tabpane">
+  <!-- Sub Navigation Bar -->
+  <nav class="cat-subnav">
+    <button class="cat-subtab active" data-subtab="cat-science">
+      <span class="subtab-icon">📊</span> Science Catalogs &amp; QPPs
+    </button>
+    <button class="cat-subtab" data-subtab="cat-opportunity">
+      <span class="subtab-icon">💡</span> Opportunity &amp; USP
+    </button>
+    <button class="cat-subtab" data-subtab="cat-architecture">
+      <span class="subtab-icon">⚡</span> Flow, Use-Case &amp; Architecture
+    </button>
+    <button class="cat-subtab" data-subtab="cat-cost">
+      <span class="subtab-icon">👥</span> Cost and Team
+    </button>
+  </nav>
+
+  <!-- 1. Science Catalogs & QPPs Subpane -->
+  <div id="subpane-cat-science" class="cat-subpane active">
+    <section class="card">
+      <div class="card-h">Detector hardness ordering — why 5 independent detectors</div>
+      <div id="hardChart" class="chart sm"></div>
+      <div class="metric-cap" id="hardCap">—</div>
+    </section>
+
+    <section class="card">
+      <div class="card-h">Master flare catalog <span class="hint" id="catTotal"></span></div>
+      <div class="cat-filters">
+        <label>Status
+          <select id="catStatus">
+            <option value="">all</option>
+            <option value="confirmed">confirmed (in SWPC)</option>
+            <option value="sub_threshold">sub-threshold (HEK only)</option>
+            <option value="candidate_novel">candidate-novel</option>
+          </select></label>
+        <label>Class
+          <select id="catClass">
+            <option value="">all</option>
+            <option value="X">X</option><option value="M">M</option>
+            <option value="C">C</option><option value="B">B</option>
+          </select></label>
+        <div class="cat-pager">
+          <button id="catPrev" class="btn">‹ Prev</button>
+          <span id="catPage" class="cat-page">—</span>
+          <button id="catNext" class="btn">Next ›</button>
+        </div>
+      </div>
+      <table class="cat-table" id="catTable"></table>
+      <div class="metric-cap" id="catNote"></div>
+    </section>
+
+    <section class="card">
+      <div class="card-h">QPP catalog — a systematic QPP candidate catalogue from Aditya-L1/HEL1OS</div>
+      <div class="qpp-summary" id="qppSummary"></div>
+      <div class="qpp-tiers" id="qppTiers"></div>
+      <div class="qpp-gallery" id="qppGallery"></div>
+      <div class="metric-cap">Wavelet panels: power normalised to the <b>Vaughan (2005) fitted red-noise continuum</b>;
+        <span class="accent">orange contour</span> = 95% red-noise significance; hatched edge region = <b>cone of influence</b>;
+        horizontal band = detected period. Detection itself uses the global (frequency-corrected) Fourier test — the quoted σ per panel.
+        Lead with the <b>classic ≥16 s</b> tier (robustly solar) and the X-class examples. The <span class="accent">short 4–8 s</span> tier is
+        statistically real (median ~59 coherent cycles) but <b>pending instrumental cross-check (Inglis 2011)</b> before solar attribution — never claimed as confirmed solar.</div>
+
+      <div class="qpp-browse">
+        <div class="qpp-browse-h">Browse the QPP catalog <span class="hint">— top 500 by significance · click a row for details</span></div>
+        <div class="cat-filters">
+          <label>Tier
+            <select id="qppTier">
+              <option value="">all tiers</option>
+              <option value="classic">classic ≥16 s (robustly solar)</option>
+              <option value="intermediate">intermediate 8–16 s</option>
+              <option value="short">short 4–8 s (pending cross-check)</option>
+            </select></label>
+          <label>Class
+            <select id="qppGoes">
+              <option value="">all</option>
+              <option value="X">X</option><option value="M">M</option>
+              <option value="C">C</option><option value="none">non-SWPC</option>
+            </select></label>
+          <div class="cat-pager">
+            <button id="qppPrev" class="btn">‹ Prev</button>
+            <span id="qppPage" class="cat-page">—</span>
+            <button id="qppNext" class="btn">Next ›</button>
+          </div>
+        </div>
+        <div id="qppDetail" class="qpp-detail" hidden></div>
+        <table class="cat-table" id="qppTable"></table>
+      </div>
+    </section>
+  </div>
+
+  <!-- 2. Opportunity & USP Subpane -->
+  <div id="subpane-cat-opportunity" class="cat-subpane">
+    <div class="guide-page">
+      <div class="guide-meta">
+        <span>Chapter 18</span>
+        <span class="guide-badge">ISRO SUBMISSION</span>
+        <span>⏱ 5 min</span>
+      </div>
+      <h1 class="guide-title">Opportunity &amp; USP</h1>
+      <div class="guide-subtitle">How it differs, how it solves the problem, the USP.</div>
+      <hr class="guide-divider">
+
+      <p class="guide-p">
+        Part IV packages everything into the exact sections ISRO's <span class="guide-code-badge">template.pdf</span> requires. This chapter covers the template's "Opportunity" slide: how the solution differs from existing ideas, how it solves the problem, and its unique selling proposition.
+      </p>
+
+      <h2 class="guide-h2">How is it different from existing ideas?</h2>
+      <p class="guide-p">
+        Most operational flare tools share two limitations: they rely on a <b>single channel</b> (usually soft X-rays) and on <b>Earth-orbit data</b>, and most "predictions" are really detections. SURYASETU differs on three concrete axes:
+      </p>
+
+      <div class="diff-grid">
+        <div class="diff-card blue">
+          <div class="diff-icon">🔗</div>
+          <h3>Dual-payload fusion</h3>
+          <p>It combines SoLEXS soft + HEL1OS hard X-rays from the L1 vantage, exploiting <i>both</i> halves of the flare's emission rather than one.</p>
+        </div>
+
+        <div class="diff-card orange">
+          <div class="diff-icon">⏰</div>
+          <h3>Physics-grounded lead time</h3>
+          <p>It forecasts the damaging soft-X-ray peak using the <b>Neupert effect</b>, a real physical mechanism, not an opaque curve fit.</p>
+        </div>
+
+        <div class="diff-card green">
+          <div class="diff-icon">✒️</div>
+          <h3>Honest, standard evaluation</h3>
+          <p>It is <b>TSS-driven</b>, calibrated, and time-blocked: the metrics the space-weather community actually trusts, reported without inflation.</p>
+        </div>
+      </div>
+
+      <h2 class="guide-h2">How will it solve the problem?</h2>
+      <p class="guide-p">
+        Nowcasting delivers operators an instant, automated flare catalogue. Forecasting delivers the one thing they cannot otherwise buy: <b>minutes of warning before the peak</b>, enough to safe-mode satellites, pause GPS-critical operations, and reduce grid loading. Because the whole system runs offline on commodity hardware from free public data, it is deployable anywhere ISRO needs it, with no recurring cost.
+      </p>
+
+      <div class="usp-highlight">
+        <div class="usp-hl-tag">USP: IN ONE SENTENCE</div>
+        <div class="usp-hl-text">
+          The only dual-payload, L1-vantage flare system that turns the Neupert effect into calibrated, TSS-validated lead-time warnings, fully reproducible at ₹0 on a laptop.
+        </div>
+      </div>
+
+      <h2 class="guide-h2">Why it will land with these judges</h2>
+      <p class="guide-p">
+        The evaluators are ISRO scientists, and the data is from ISRO's own mission. A submission that uses <i>their</i> satellite's two payloads correctly, respects the real physics of the Sun, and is honest about the difference between defensible peak-forecasting and frontier onset-forecasting (Chapter 5) signals genuine domain understanding, not a generic ML pipeline pointed at unfamiliar data. That credibility, plus a quantifiable lead-time number, is the winning combination.
+      </p>
+    </div>
+  </div>
+
+  <!-- 3. Flow, Use-Case & Architecture Subpane -->
+  <div id="subpane-cat-architecture" class="cat-subpane">
+    <div class="guide-page">
+      <div class="guide-meta">
+        <span>Chapter 20</span>
+        <span class="guide-badge">ISRO SUBMISSION</span>
+        <span>⏱ 4 min</span>
+      </div>
+      <h1 class="guide-title">Flow · Use-case · Architecture</h1>
+      <div class="guide-subtitle">The template's required diagrams, on screen.</div>
+      <hr class="guide-divider">
+
+      <p class="guide-p">
+        The ISRO template asks for three diagrams: a process-flow or use-case diagram, and an architecture diagram. All three are here, on screen, the same diagrams that appeared in context throughout the guide, collected for the submission and ready to export to the deck.
+      </p>
+
+      <!-- Diagram 1: Process-flow diagram -->
+      <h2 class="guide-h2">Process-flow diagram</h2>
+      <div class="diagram-card">
+        <div class="diagram-header">DATA PROCESS FLOW</div>
+        <div class="flow-svg-wrap">
+          <svg viewBox="0 0 860 170" width="100%" height="170" style="max-width:860px">
+            <!-- Animated Background Pulse Paths -->
+            <path d="M 125 85 L 195 85 M 305 85 L 375 85 M 485 85 L 530 85 L 565 42 M 485 85 L 530 85 L 565 128 M 695 42 L 725 42 L 740 85 M 695 128 L 725 128 L 740 85" fill="none" class="flow-pulse-line" />
+            <!-- Static Connector lines -->
+            <path d="M 125 85 L 195 85" stroke="#2c3e55" stroke-width="2" />
+            <path d="M 305 85 L 375 85" stroke="#2c3e55" stroke-width="2" />
+            <path d="M 485 85 L 530 85 L 565 42" stroke="#2c3e55" stroke-width="2" />
+            <path d="M 485 85 L 530 85 L 565 128" stroke="#2c3e55" stroke-width="2" />
+            <path d="M 695 42 L 725 42 L 740 85" stroke="#2c3e55" stroke-width="2" />
+            <path d="M 695 128 L 725 128 L 740 85" stroke="#2c3e55" stroke-width="2" />
+
+            <!-- Node: Raw FITS -->
+            <g transform="translate(15, 60)">
+              <rect width="110" height="50" class="flow-node highlight" />
+              <text x="55" y="24" text-anchor="middle" class="flow-text-main">Raw FITS</text>
+              <text x="55" y="39" text-anchor="middle" class="flow-text-sub">SoLEXS + HEL1OS</text>
+            </g>
+
+            <!-- Node: Ingest + GTI -->
+            <g transform="translate(195, 60)">
+              <rect width="110" height="50" class="flow-node orange" />
+              <text x="55" y="24" text-anchor="middle" class="flow-text-main">Ingest + GTI</text>
+              <text x="55" y="39" text-anchor="middle" class="flow-text-sub">mask gaps</text>
+            </g>
+
+            <!-- Node: Fuse -->
+            <g transform="translate(375, 60)">
+              <rect width="110" height="50" class="flow-node orange" />
+              <text x="55" y="24" text-anchor="middle" class="flow-text-main">Fuse</text>
+              <text x="55" y="39" text-anchor="middle" class="flow-text-sub">1-s grid</text>
+            </g>
+
+            <!-- Node: Nowcast -->
+            <g transform="translate(565, 17)">
+              <rect width="130" height="50" class="flow-node green" />
+              <text x="65" y="24" text-anchor="middle" class="flow-text-main">Nowcast</text>
+              <text x="65" y="39" text-anchor="middle" class="flow-text-sub">classical detector</text>
+            </g>
+
+            <!-- Node: Forecast -->
+            <g transform="translate(565, 103)">
+              <rect width="130" height="50" class="flow-node orange" />
+              <text x="65" y="24" text-anchor="middle" class="flow-text-main">Forecast</text>
+              <text x="65" y="39" text-anchor="middle" class="flow-text-sub">LightGBM + MiniROCKET</text>
+            </g>
+
+            <!-- Node: Alerts + catalogue -->
+            <g transform="translate(740, 60)">
+              <rect width="105" height="50" class="flow-node purple" />
+              <text x="52" y="23" text-anchor="middle" class="flow-text-main">Alerts +</text>
+              <text x="52" y="38" text-anchor="middle" class="flow-text-main">catalogue</text>
+            </g>
+          </svg>
+        </div>
+        <div class="diagram-caption">
+          Raw payload files ⇒ Ingest &amp; GTI ⇒ fuse ⇒ the parallel nowcast / forecast engines ⇒ alerts + catalogue. The gold pulse traces a datum moving through the pipeline.
+        </div>
+      </div>
+
+      <!-- Diagram 2: Use-case diagram -->
+      <h2 class="guide-h2">Use-case diagram</h2>
+      <div class="diagram-card">
+        <div class="diagram-header">ACTORS AND USE CASES</div>
+        <div class="flow-svg-wrap">
+          <svg viewBox="0 0 860 210" width="100%" height="210" style="max-width:860px">
+            <!-- Connecting lines -->
+            <!-- Ops operator to Receive flare alert & Browse catalogue -->
+            <line x1="160" y1="65" x2="310" y2="45" stroke="#1a73e8" stroke-width="2" marker-end="url(#arr-blue)" />
+            <line x1="160" y1="65" x2="310" y2="105" stroke="#1a73e8" stroke-width="2" marker-end="url(#arr-blue)" />
+            <!-- Researcher to Browse catalogue & Replay historical day -->
+            <line x1="160" y1="145" x2="310" y2="105" stroke="#1a73e8" stroke-width="2" marker-end="url(#arr-blue)" />
+            <line x1="160" y1="145" x2="310" y2="165" stroke="#1a73e8" stroke-width="2" marker-end="url(#arr-blue)" />
+            <!-- Browse catalogue to Audit SHAP (dotted) -->
+            <line x1="510" y1="105" x2="610" y2="105" stroke="#1a73e8" stroke-width="2" stroke-dasharray="4 4" marker-end="url(#arr-blue)" />
+
+            <!-- Arrow marker -->
+            <defs>
+              <marker id="arr-blue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1 L 8 5 L 0 9 z" fill="#1a73e8" />
+              </marker>
+            </defs>
+
+            <!-- Actor 1: Ops operator -->
+            <g transform="translate(100, 30)">
+              <!-- Stick Figure -->
+              <circle cx="25" cy="12" r="8" fill="none" stroke="#f2994a" stroke-width="2" />
+              <line x1="25" y1="20" x2="25" y2="42" stroke="#f2994a" stroke-width="2" />
+              <line x1="12" y1="28" x2="38" y2="28" stroke="#f2994a" stroke-width="2" />
+              <line x1="25" y1="42" x2="15" y2="60" stroke="#f2994a" stroke-width="2" />
+              <line x1="25" y1="42" x2="35" y2="60" stroke="#f2994a" stroke-width="2" />
+              <text x="25" y="76" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="650" font-family="var(--sans)">Ops operator</text>
+            </g>
+
+            <!-- Actor 2: Researcher -->
+            <g transform="translate(100, 115)">
+              <!-- Stick Figure -->
+              <circle cx="25" cy="12" r="8" fill="none" stroke="#f2994a" stroke-width="2" />
+              <line x1="25" y1="20" x2="25" y2="42" stroke="#f2994a" stroke-width="2" />
+              <line x1="12" y1="28" x2="38" y2="28" stroke="#f2994a" stroke-width="2" />
+              <line x1="25" y1="42" x2="15" y2="60" stroke="#f2994a" stroke-width="2" />
+              <line x1="25" y1="42" x2="35" y2="60" stroke="#f2994a" stroke-width="2" />
+              <text x="25" y="76" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="650" font-family="var(--sans)">Researcher</text>
+            </g>
+
+            <!-- Use Case 1: Receive flare alert -->
+            <g transform="translate(310, 25)">
+              <ellipse cx="100" cy="20" rx="100" ry="20" fill="#152438" stroke="#253e60" stroke-width="1.5" />
+              <text x="100" y="24" text-anchor="middle" fill="#fff" font-size="12" font-weight="650" font-family="var(--sans)">Receive flare alert</text>
+            </g>
+
+            <!-- Use Case 2: Browse catalogue -->
+            <g transform="translate(310, 85)">
+              <ellipse cx="100" cy="20" rx="100" ry="20" fill="#152438" stroke="#253e60" stroke-width="1.5" />
+              <text x="100" y="24" text-anchor="middle" fill="#fff" font-size="12" font-weight="650" font-family="var(--sans)">Browse catalogue</text>
+            </g>
+
+            <!-- Use Case 3: Replay historical day -->
+            <g transform="translate(310, 145)">
+              <ellipse cx="100" cy="20" rx="100" ry="20" fill="#152438" stroke="#253e60" stroke-width="1.5" />
+              <text x="100" y="24" text-anchor="middle" fill="#fff" font-size="12" font-weight="650" font-family="var(--sans)">Replay historical day</text>
+            </g>
+
+            <!-- Use Case 4: Audit "why" (SHAP) -->
+            <g transform="translate(610, 85)">
+              <ellipse cx="100" cy="20" rx="100" ry="20" fill="#152438" stroke="#253e60" stroke-width="1.5" />
+              <text x="100" y="24" text-anchor="middle" fill="#fff" font-size="12" font-weight="650" font-family="var(--sans)">Audit "why" (SHAP)</text>
+            </g>
+          </svg>
+        </div>
+        <div class="diagram-caption">
+          Two actors: an operations operator and a researcher, and the four things they do with the system.
+        </div>
+      </div>
+
+      <!-- Diagram 3: Architecture diagram -->
+      <h2 class="guide-h2">Architecture diagram</h2>
+      <div class="diagram-card" style="position:relative">
+        <div class="diagram-header">FULL SYSTEM ARCHITECTURE (INTERACTIVE)</div>
+        
+        <div class="flow-svg-wrap" style="position:relative">
+          <svg viewBox="0 0 900 400" width="100%" height="400" style="max-width:900px;background:#0c131d;border-radius:8px">
+            <!-- Background dot grid -->
+            <defs>
+              <pattern id="grid-dots" width="20" height="20" patternUnits="userSpaceOnUse">
+                <circle cx="2" cy="2" r="1" fill="#182333" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid-dots)" />
+
+            <!-- Connecting paths -->
+            <path d="M 140 85 C 170 85, 170 120, 200 120" fill="none" stroke="#264366" stroke-width="1.5" />
+            <path d="M 140 165 C 170 165, 170 140, 200 140" fill="none" stroke="#264366" stroke-width="1.5" />
+            <path d="M 140 245 C 170 245, 170 320, 720 320" fill="none" stroke="#264366" stroke-width="1.5" stroke-dasharray="3 3" />
+            
+            <path d="M 300 130 C 330 130, 330 185, 360 185" fill="none" stroke="#264366" stroke-width="1.5" />
+            <path d="M 300 200 C 330 200, 330 145, 360 145" fill="none" stroke="#264366" stroke-width="1.5" />
+            <path d="M 300 200 C 330 200, 330 280, 360 280" fill="none" stroke="#264366" stroke-width="1.5" />
+
+            <path d="M 480 145 C 510 145, 510 120, 540 120" fill="none" stroke="#264366" stroke-width="1.5" />
+            <path d="M 480 145 C 510 145, 510 185, 540 185" fill="none" stroke="#264366" stroke-width="1.5" />
+            <path d="M 480 280 C 510 280, 510 320, 720 320" fill="none" stroke="#264366" stroke-width="1.5" />
+
+            <path d="M 640 120 C 670 120, 670 250, 700 250" fill="none" stroke="#264366" stroke-width="1.5" />
+            <path d="M 640 185 C 670 185, 670 250, 700 250" fill="none" stroke="#264366" stroke-width="1.5" />
+
+            <path d="M 640 260 C 680 260, 680 120, 720 120" fill="none" stroke="#264366" stroke-width="1.5" />
+            <path d="M 640 260 C 680 260, 680 200, 720 200" fill="none" stroke="#264366" stroke-width="1.5" />
+
+            <!-- Col 1: Inputs -->
+            <!-- SoLEXS -->
+            <g transform="translate(40, 60)">
+              <rect width="100" height="50" rx="8" fill="#121e2e" stroke="#1f6feb" stroke-width="1.5" />
+              <text x="50" y="22" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">SoLEXS</text>
+              <text x="50" y="37" text-anchor="middle" fill="#79c0ff" font-size="9">soft 1–22 keV · .lc / .gti</text>
+            </g>
+            <!-- HEL1OS -->
+            <g transform="translate(40, 140)">
+              <rect width="100" height="50" rx="8" fill="#121e2e" stroke="#1f6feb" stroke-width="1.5" />
+              <text x="50" y="22" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">HEL1OS</text>
+              <text x="50" y="37" text-anchor="middle" fill="#79c0ff" font-size="9">hard 8–150 keV · .lc</text>
+            </g>
+            <!-- GOES catalog -->
+            <g transform="translate(40, 220)">
+              <rect width="100" height="50" rx="8" fill="#121e2e" stroke="#238636" stroke-width="1.5" />
+              <text x="50" y="22" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">GOES catalog</text>
+              <text x="50" y="37" text-anchor="middle" fill="#7ee787" font-size="9">labels · 15s</text>
+            </g>
+
+            <!-- Col 2: Ingestion & Resampling -->
+            <!-- Ingest + GTI -->
+            <g transform="translate(190, 100)">
+              <rect width="110" height="50" rx="8" fill="#1a1c18" stroke="#d29922" stroke-width="1.5" />
+              <text x="55" y="22" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">Ingest + GTI</text>
+              <text x="55" y="37" text-anchor="middle" fill="#e3b341" font-size="9">mask invalid times · astropy</text>
+            </g>
+            <!-- Fuse & resample -->
+            <g transform="translate(190, 175)">
+              <rect width="110" height="50" rx="8" fill="#1a1c18" stroke="#d29922" stroke-width="1.5" />
+              <text x="55" y="22" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">Fuse &amp; resample</text>
+              <text x="55" y="37" text-anchor="middle" fill="#e3b341" font-size="9">SDD1-2, soft+hard → 1-s grid</text>
+            </g>
+
+            <!-- Col 3: Features & Nowcast -->
+            <!-- Feature engineering -->
+            <g transform="translate(350, 120)">
+              <rect width="130" height="50" rx="8" fill="#1a1c18" stroke="#d29922" stroke-width="1.5" />
+              <text x="65" y="22" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">Feature engineering</text>
+              <text x="65" y="37" text-anchor="middle" fill="#e3b341" font-size="9">Neupert features · numpy/scipy</text>
+            </g>
+            <!-- Nowcast engine -->
+            <g transform="translate(350, 255)">
+              <rect width="130" height="50" rx="8" fill="#121e1e" stroke="#238636" stroke-width="1.5" />
+              <text x="65" y="22" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">Nowcast engine</text>
+              <text x="65" y="37" text-anchor="middle" fill="#7ee787" font-size="9">classical detector · scipy</text>
+            </g>
+
+            <!-- Col 4: Models -->
+            <!-- LightGBM -->
+            <g transform="translate(530, 95)">
+              <rect width="110" height="45" rx="8" fill="#1a1c18" stroke="#d29922" stroke-width="1.5" />
+              <text x="55" y="20" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">LightGBM</text>
+              <text x="55" y="34" text-anchor="middle" fill="#e3b341" font-size="9">physics features · lightgbm</text>
+            </g>
+            <!-- MiniROCKET -->
+            <g transform="translate(530, 160)">
+              <rect width="110" height="45" rx="8" fill="#1a1c18" stroke="#d29922" stroke-width="1.5" />
+              <text x="55" y="20" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">MiniROCKET</text>
+              <text x="55" y="34" text-anchor="middle" fill="#e3b341" font-size="9">raw windows · sktime</text>
+            </g>
+            <!-- Calibrated fusion -->
+            <g transform="translate(530, 235)">
+              <rect width="110" height="45" rx="8" fill="#1c1626" stroke="#a371f7" stroke-width="1.5" />
+              <text x="55" y="20" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">Calibrated fusion</text>
+              <text x="55" y="34" text-anchor="middle" fill="#d2a8ff" font-size="9">isotonic → P(flare) · sklearn</text>
+            </g>
+
+            <!-- Col 5: Outputs -->
+            <!-- Dashboard -->
+            <g transform="translate(710, 95)">
+              <rect width="120" height="45" rx="8" fill="#1c1626" stroke="#a371f7" stroke-width="1.5" />
+              <text x="60" y="20" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">Dashboard</text>
+              <text x="60" y="34" text-anchor="middle" fill="#d2a8ff" font-size="9">alerts · deliverable d3</text>
+            </g>
+            <!-- Evaluation -->
+            <g transform="translate(710, 175)">
+              <rect width="120" height="45" rx="8" fill="#1c1626" stroke="#a371f7" stroke-width="1.5" />
+              <text x="60" y="20" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">Evaluation</text>
+              <text x="60" y="34" text-anchor="middle" fill="#d2a8ff" font-size="9">TSS · blocked CV · sklearn</text>
+            </g>
+            <!-- Master catalogue -->
+            <g transform="translate(710, 295)">
+              <rect width="120" height="45" rx="8" fill="#121e1e" stroke="#238636" stroke-width="1.5" />
+              <text x="60" y="20" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">Master catalogue</text>
+              <text x="60" y="34" text-anchor="middle" fill="#7ee787" font-size="9">deliverable d1</text>
+            </g>
+
+            <!-- Zoom controls (decorative / interactive styling) -->
+            <g transform="translate(30, 335)">
+              <rect width="26" height="24" rx="4" fill="#1a2636" stroke="#2d3d52" />
+              <text x="13" y="17" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">+</text>
+              <rect x="30" width="26" height="24" rx="4" fill="#1a2636" stroke="#2d3d52" />
+              <text x="43" y="16" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">−</text>
+              <rect x="60" width="26" height="24" rx="4" fill="#1a2636" stroke="#2d3d52" />
+              <text x="73" y="16" text-anchor="middle" fill="#fff" font-size="11">⛶</text>
+            </g>
+          </svg>
+        </div>
+        <div class="diagram-caption">
+          The complete layered architecture from Chapter 11, with every component labelled by its technology. Drag to explore.
+        </div>
+      </div>
+
+      <p class="guide-p" style="margin-top:1.5rem">
+        Use <span class="guide-kbd">Ctrl/Cmd + P</span> to print these sections into the BAH-2026 submission deck.
+      </p>
+    </div>
+  </div>
+
+  <!-- 4. Cost and Team Subpane -->
+  <div id="subpane-cat-cost" class="cat-subpane">
+    <div class="guide-page">
+      <div class="guide-meta">
+        <span>Chapter 21</span>
+        <span class="guide-badge">ISRO SUBMISSION</span>
+        <span>⏱ 4 min</span>
+      </div>
+      <h1 class="guide-title">Cost &amp; Team</h1>
+      <div class="guide-subtitle">The ₹0 breakdown and the editable cover.</div>
+      <hr class="guide-divider">
+
+      <p class="guide-p">
+        The last two template slides: the estimated implementation cost, and the team cover. The cost story is simple, because there isn't one.
+      </p>
+
+      <h2 class="guide-h2">Estimated implementation cost</h2>
+      <table class="cost-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th style="width:90px">Cost</th>
+            <th>Note</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Aditya-L1 SoLEXS + HEL1OS data</td>
+            <td class="cost-zero">₹0</td>
+            <td>free via ISSDC PRADAN (registered)</td>
+          </tr>
+          <tr>
+            <td>GOES flare catalog (labels)</td>
+            <td class="cost-zero">₹0</td>
+            <td>free, NOAA</td>
+          </tr>
+          <tr>
+            <td>Software stack</td>
+            <td class="cost-zero">₹0</td>
+            <td>all open-source (BSD/MIT/Apache)</td>
+          </tr>
+          <tr>
+            <td>Compute</td>
+            <td class="cost-zero">₹0</td>
+            <td>existing laptop (i5-13420H / RTX 3050 / 16 GB)</td>
+          </tr>
+          <tr>
+            <td>Storage</td>
+            <td class="cost-zero">₹0</td>
+            <td>existing 256 GB external drive (~5 GB used)</td>
+          </tr>
+          <tr>
+            <td>Hosting (demo)</td>
+            <td class="cost-zero">₹0</td>
+            <td>Streamlit local; optional free HF Spaces</td>
+          </tr>
+          <tr class="total-row">
+            <td><b>Total</b></td>
+            <td class="cost-zero"><b>₹0</b></td>
+            <td><b>only real input is engineering time</b></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- 4 Stat Badges -->
+      <div class="cost-stat-grid">
+        <div class="cost-stat-card">
+          <span class="cost-stat-val">₹0</span>
+          <span class="cost-stat-lbl">capital cost</span>
+        </div>
+        <div class="cost-stat-card">
+          <span class="cost-stat-val">~5 GB</span>
+          <span class="cost-stat-lbl">targeted data</span>
+        </div>
+        <div class="cost-stat-card">
+          <span class="cost-stat-val">~2 wk</span>
+          <span class="cost-stat-lbl">AI-assisted build</span>
+        </div>
+        <div class="cost-stat-card">
+          <span class="cost-stat-val">CPU</span>
+          <span class="cost-stat-lbl">first; GPU optional</span>
+        </div>
+      </div>
+
+      <h2 class="guide-h2">Team &amp; cover</h2>
+      <div class="team-cover-box">
+        <div class="team-cover-meta">
+          <div class="team-cover-field">
+            <span class="team-cover-field-lbl">Team Name</span>
+            <span class="team-cover-field-val">SURYASETU</span>
+          </div>
+          <div class="team-cover-field">
+            <span class="team-cover-field-lbl">Problem Statement</span>
+            <span class="team-cover-field-val">PS-15 · Forecasting / Nowcasting of Solar Flares (Aditya-L1)</span>
+          </div>
+        </div>
+
+        <div class="team-cover-grid">
+          <div class="team-member-cover-card">
+            <span class="team-member-cover-tag">Team Member</span>
+            <h3 class="team-member-cover-name">Sulagna Dutta</h3>
+            <span class="team-member-cover-org">Adamas University</span>
+            <div class="team-member-cover-role">
+              B.Tech, 3rd Year — builds the entire pipeline (core logic &amp; main architecture)
+            </div>
+          </div>
+
+          <div class="team-member-cover-card">
+            <span class="team-member-cover-tag">Team Member</span>
+            <h3 class="team-member-cover-name">Mitra Sarkar</h3>
+            <span class="team-member-cover-org">Adamas University</span>
+            <div class="team-member-cover-role">
+              3rd Year — builds UI/UX design and all physics-based animation
+            </div>
+          </div>
+
+          <div class="team-member-cover-card">
+            <span class="team-member-cover-tag">Team Member</span>
+            <h3 class="team-member-cover-name">Shounak Chatterjee</h3>
+            <span class="team-member-cover-org">Adamas University</span>
+            <div class="team-member-cover-role">
+              B.Tech, 3rd Year — builds the fullstack project and handles deployment
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="complete-callout">
+        <div class="complete-tag">THE GUIDE IS COMPLETE</div>
+        <div class="complete-text">
+          You've gone from "what is a solar flare?" to a fully-specified, ISRO-aligned, ₹0 system with every diagram on screen and a nine-phase build plan. Every template section is covered, every deliverable has a home, and every design choice has a defence. Execute the roadmap with AI-assisted implementation and start building. Use <span class="guide-kbd">Ctrl/Cmd + P</span> to export the submission sections to the BAH-2026 deck.
+        </div>
+      </div>
+
+      <div class="guide-foot-note">
+        SURYASETU · Built for Bharatiya Antariksh Hackathon 2026 · Problem Statement 15. Real SoLEXS sample: 2026-06-15 SDD2, parsed from the downloaded day-file. Instrument figures verified against the published SoLEXS and HEL1OS papers (<i>Solar Physics</i>, 2025) and the Neupert-effect literature. The animated Neupert and reconnection figures are physically-faithful schematics, labelled as such.
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <span>Replay of <b>real model outputs</b> on held-out Aditya-L1 data; forecasts are <b>calibrated probabilities</b>, not certainties.</span>
+  <span class="foot-right">ISRO · PS-15 · Forecasting &amp; Nowcasting of Solar Flares</span>
+</footer>
+
+<div id="errBar" class="errbar"></div>
+<script src="/js/app.js"></script>
+<script src="/js/replay.js"></script>
+<script src="/js/performance.js"></script>
+<script src="/js/operations.js"></script>
+<script src="/js/catalog.js"></script>
+</body>
+</html>

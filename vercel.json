@@ -1,9 +1,20 @@
 {
   "version": 2,
+  "functions": {
+    "api/index.py": {
+      "includeFiles": "dashboard_data/**,app/static/**"
+    }
+  },
   "builds": [
     {
       "src": "api/index.py",
-      "use": "@vercel/python"
+      "use": "@vercel/python",
+      "config": {
+        "includeFiles": [
+          "dashboard_data/**",
+          "app/static/**"
+        ]
+      }
     }
   ],
   "routes": [

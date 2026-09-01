@@ -28,9 +28,46 @@ from app.database import (
 from app.models import ForecastRecord, AlertRecord, SystemStatusRecord
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-_ENV_DATA_DIR = os.environ.get("DATA_DIR", "dashboard_data")
-DATA = (PROJECT_ROOT / _ENV_DATA_DIR) if not Path(_ENV_DATA_DIR).is_absolute() else Path(_ENV_DATA_DIR)
-STATIC = Path(__file__).resolve().parent / "static"
+
+def _find_data_dir() -> Path:
+    env_dir = os.environ.get("DATA_DIR", "dashboard_data")
+    candidates = [
+        Path(env_dir) if Path(env_dir).is_absolute() else None,
+        Path(__file__).resolve().parents[1] / env_dir,
+        Path(__file__).resolve().parents[0] / env_dir,
+        Path(__file__).resolve().parents[1] / "api" / "dashboard_data",
+        Path(__file__).resolve().parents[0] / "api" / "dashboard_data",
+        Path(os.getcwd()) / env_dir,
+        Path(os.getcwd()) / "api" / "dashboard_data",
+        Path("/var/task") / env_dir,
+        Path("/var/task/dashboard_data"),
+        Path("/var/task/api/dashboard_data"),
+        Path(__file__).resolve().parent.parent / "dashboard_data",
+        Path(__file__).resolve().parent / "dashboard_data",
+    ]
+    for c in candidates:
+        if c is not None and c.exists() and (c / "manifest.json").exists():
+            return c
+    return Path(__file__).resolve().parents[1] / env_dir
+
+DATA = _find_data_dir()
+
+def _find_static_dir() -> Path:
+    candidates = [
+        Path(__file__).resolve().parent / "static",
+        Path(__file__).resolve().parents[1] / "app" / "static",
+        Path(__file__).resolve().parents[1] / "api" / "static",
+        Path(os.getcwd()) / "app" / "static",
+        Path(os.getcwd()) / "api" / "static",
+        Path("/var/task/app/static"),
+        Path("/var/task/api/static"),
+    ]
+    for c in candidates:
+        if c.exists() and (c / "index.html").exists():
+            return c
+    return Path(__file__).resolve().parent / "static"
+
+STATIC = _find_static_dir()
 
 app = FastAPI(
     title="SuryaSetu: Aditya-L1 Solar Flare Forecaster",
@@ -73,7 +110,25 @@ _cache: dict[str, dict] = {}
 def _load(rel: str) -> dict:
     if rel in _cache:
         return _cache[rel]
+    
+    global DATA
     p = DATA / rel
+    if not p.exists():
+        # Fallback multi-path search for lambda runtime
+        for candidate_dir in [
+            Path(os.getcwd()) / "dashboard_data",
+            Path(__file__).resolve().parents[1] / "dashboard_data",
+            Path(__file__).resolve().parent.parent / "dashboard_data",
+            Path(__file__).resolve().parent / "dashboard_data",
+            Path("/var/task/dashboard_data"),
+            Path("/var/task") / os.environ.get("DATA_DIR", "dashboard_data"),
+            Path(os.environ.get("DATA_DIR", "dashboard_data")),
+        ]:
+            if candidate_dir.exists() and (candidate_dir / rel).exists():
+                DATA = candidate_dir
+                p = candidate_dir / rel
+                break
+
     if not p.exists():
         raise HTTPException(
             status_code=404,
