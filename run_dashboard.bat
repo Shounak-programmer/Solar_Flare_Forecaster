@@ -1,6 +1,6 @@
 @echo off
 REM ============================================================
-REM  Aditya-L1 Solar Flare Forecaster - Dashboard launcher
+REM  Solar Flare Detection System - L1 - Dashboard launcher
 REM  Double-click to start the server and open the browser.
 REM    run_dashboard.bat            start the dashboard
 REM    run_dashboard.bat refresh    rebuild dashboard_data first, then start
@@ -8,7 +8,7 @@ REM  Serves pre-computed outputs only (no live inference).
 REM ============================================================
 setlocal
 cd /d "%~dp0"
-title Aditya-L1 Solar Flare Dashboard
+title Solar Flare Detection System - L1
 
 REM --- pick a Python launcher (python, else py) ---
 set "PY=python"
@@ -42,7 +42,7 @@ if /i "%~1"=="refresh" (
 )
 
 echo.
-echo  Aditya-L1 Solar Flare Forecaster
+echo  Solar Flare Detection System - L1
 echo  Starting dashboard on http://127.0.0.1:8000
 echo  (Leave this window open during the demo. Press Ctrl+C to stop.)
 echo.

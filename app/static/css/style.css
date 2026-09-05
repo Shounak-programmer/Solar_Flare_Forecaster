@@ -1,5 +1,5 @@
 /* ============================================================================
-   Aditya-L1 Solar Flare Forecaster — space-weather operations console
+   Solar Flare Detection System - L1 — space-weather operations console
    Design system: deep-navy chrome, orange operational accent, white cards on a
    cool light-grey field. Soft layered shadows, generous spacing, projector-legible.
    ========================================================================== */
@@ -430,8 +430,61 @@ select{font-family:inherit;color:var(--ink);cursor:pointer}
 .placeholder{padding:3rem;text-align:center;color:var(--muted)}
 .footer{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:space-between;
   gap:1rem;background:var(--navy-deep);color:#a9c1da;font-size:.74rem;padding:.5rem 1.75rem;
-  border-top:1px solid var(--navy-line);z-index:30}
+  border-top:1px solid var(--navy-line);z-index:30;align-items:center}
 .footer b{color:#fff}
+
+/* ── Visitor counter ──────────────────────────────────────────────────────── */
+.visitor-count-wrap{
+  display:flex;align-items:center;gap:.45rem;
+  white-space:nowrap;flex-shrink:0;
+  color:#a9c1da;font-size:.74rem;letter-spacing:.02em;
+}
+
+/* Odometer container */
+.odometer{
+  display:inline-flex;align-items:center;
+  font-variant-numeric:tabular-nums;
+  font-weight:700;color:#e2f0ff;
+  font-size:.82rem;letter-spacing:.04em;
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:4px;
+  padding:.1rem .45rem;
+  overflow:hidden;
+  position:relative;
+}
+
+/* Each digit slot */
+.odo-digit{
+  display:inline-block;
+  width:.62em;
+  height:1.2em;
+  overflow:hidden;
+  position:relative;
+  vertical-align:middle;
+}
+.odo-digit-inner{
+  display:block;
+  transition:transform .55s cubic-bezier(.22,.68,0,1.2);
+  /* 10 rows: 0-9, set to correct offset via JS */
+}
+.odo-digit-inner span{
+  display:block;
+  height:1.2em;
+  line-height:1.2em;
+  text-align:center;
+}
+
+/* Separator (comma) */
+.odo-sep{
+  display:inline-block;
+  color:#7fa8c9;
+  font-weight:400;
+  width:.3em;
+  text-align:center;
+  vertical-align:middle;
+}
+
 .errbar{position:fixed;bottom:44px;left:50%;transform:translateX(-50%);
   background:#c0392b;color:#fff;padding:.65rem 1.15rem;border-radius:var(--radius-sm);
   font-size:.86rem;font-weight:600;display:none;z-index:50;box-shadow:var(--shadow-lg)}

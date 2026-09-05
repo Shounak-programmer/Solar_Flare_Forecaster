@@ -61,7 +61,7 @@ def get_db_status() -> dict[str, Any]:
             return {
                 "connected": True,
                 "database": MONGODB_DATABASE,
-                "collections": ["forecasts", "alerts", "system_status"]
+                "collections": ["forecasts", "alerts", "system_status", "site_stats"]
             }
         except Exception as e:
             return {"connected": False, "reason": str(e)}
@@ -129,3 +129,42 @@ def insert_alert(record: dict[str, Any]) -> bool:
     except Exception as e:
         logger.error(f"Error inserting alert: {e}")
         return False
+
+
+def increment_visitor_count() -> int:
+    """Atomically increments the global visitor counter and returns the new count.
+    Uses upsert so the document is created automatically on first visit.
+    Falls back to an in-memory counter when MongoDB is unavailable.
+    """
+    db = get_database()
+    if db is None:
+        # Standalone fallback — keep an in-memory counter
+        increment_visitor_count._standalone_count = getattr(
+            increment_visitor_count, "_standalone_count", 0
+        ) + 1
+        return increment_visitor_count._standalone_count
+    try:
+        from pymongo import ReturnDocument
+        result = db.site_stats.find_one_and_update(
+            {"_id": "visitor_counter"},
+            {"$inc": {"count": 1}},
+            upsert=True,
+            return_document=ReturnDocument.AFTER,
+        )
+        return int(result.get("count", 1))
+    except Exception as e:
+        logger.error(f"Error incrementing visitor count: {e}")
+        return -1
+
+
+def get_visitor_count() -> int:
+    """Returns the current visitor count without incrementing it."""
+    db = get_database()
+    if db is None:
+        return getattr(increment_visitor_count, "_standalone_count", 0)
+    try:
+        doc = db.site_stats.find_one({"_id": "visitor_counter"})
+        return int(doc["count"]) if doc else 0
+    except Exception as e:
+        logger.error(f"Error fetching visitor count: {e}")
+        return -1

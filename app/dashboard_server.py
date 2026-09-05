@@ -24,6 +24,8 @@ from app.database import (
     get_recent_alerts,
     insert_forecast,
     insert_alert,
+    increment_visitor_count,
+    get_visitor_count,
 )
 from app.models import ForecastRecord, AlertRecord, SystemStatusRecord
 
@@ -70,7 +72,7 @@ def _find_static_dir() -> Path:
 STATIC = _find_static_dir()
 
 app = FastAPI(
-    title="SuryaSetu: Aditya-L1 Solar Flare Forecaster",
+    title="Solar Flare Detection System - L1",
     description="Operational Solar Flare Forecasting and Nowcasting API for Aditya-L1",
     version="1.0.0",
 )
@@ -239,6 +241,23 @@ def post_alert(record: AlertRecord):
     data = record.model_dump()
     success = insert_alert(data)
     return {"status": "saved" if success else "received_standalone", "alert": data}
+
+
+# ── Visitor counter ──────────────────────────────────────────────────────────
+@app.get("/api/visitor_count", tags=["System"])
+def visitor_count_get():
+    """Returns the current total visitor count from MongoDB."""
+    count = get_visitor_count()
+    return {"visitor_count": count}
+
+
+@app.post("/api/visitor_count/increment", tags=["System"])
+def visitor_count_increment():
+    """Atomically increments the visitor counter and returns the new total.
+    Called once per page load from the frontend.
+    """
+    new_count = increment_visitor_count()
+    return {"visitor_count": new_count}
 
 
 @app.get("/api/live", tags=["Live"])

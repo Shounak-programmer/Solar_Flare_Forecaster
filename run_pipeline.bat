@@ -1,6 +1,6 @@
 @echo off
 REM =====================================================================
-REM  Aditya-L1 Solar Flare Forecaster - end-to-end pipeline runner
+REM  Solar Flare Detection System - L1 - end-to-end pipeline runner
 REM
 REM  Usage:  run_pipeline.bat [mode]
 REM

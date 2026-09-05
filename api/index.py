@@ -23,7 +23,10 @@ STATIC = _HERE / "static"                         # /var/task/api/static/
 
 # ── Lazy DB & models (optional, graceful fallback) ────────────────────────────
 try:
-    from app.database import get_db_status, get_latest_forecast, get_recent_alerts, insert_forecast, insert_alert
+    from app.database import (
+        get_db_status, get_latest_forecast, get_recent_alerts, insert_forecast, insert_alert,
+        increment_visitor_count, get_visitor_count,
+    )
     from app.models import ForecastRecord, AlertRecord, SystemStatusRecord
     _HAS_DB = True
 except ImportError:
@@ -33,10 +36,12 @@ except ImportError:
     def get_recent_alerts(limit=20): return []
     def insert_forecast(r): return False
     def insert_alert(r): return False
+    def increment_visitor_count(): return 1
+    def get_visitor_count(): return 1
 
 # ── App ───────────────────────────────────────────────────────────────────────
 app = FastAPI(
-    title="SuryaSetu: Aditya-L1 Solar Flare Forecaster",
+    title="Solar Flare Detection System - L1",
     description="Operational Solar Flare Forecasting and Nowcasting API for Aditya-L1",
     version="1.0.0",
 )
@@ -250,6 +255,21 @@ def qpp_wavelet(wid: str):
     if not wid.replace("_", "").isalnum():
         raise HTTPException(status_code=400, detail="bad wavelet id")
     return _load(f"wavelets/{wid}.json")
+
+
+# ── Visitor counter ──────────────────────────────────────────────────────────
+@app.get("/api/visitor_count", tags=["System"])
+def visitor_count_get():
+    """Returns the current total visitor count from MongoDB."""
+    count = get_visitor_count()
+    return {"visitor_count": count}
+
+
+@app.post("/api/visitor_count/increment", tags=["System"])
+def visitor_count_increment():
+    """Atomically increments the visitor counter and returns the new total."""
+    new_count = increment_visitor_count()
+    return {"visitor_count": new_count}
 
 
 # ── Static frontend ───────────────────────────────────────────────────────────

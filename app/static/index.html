@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Aditya-L1 Solar Flare Forecaster</title>
+<title>Solar Flare Detection System - L1</title>
 <link rel="stylesheet" href="/css/style.css">
 <script src="/vendor/plotly-2.35.2.min.js" charset="utf-8"></script>
 </head>
@@ -12,7 +12,7 @@
   <div class="brand">
     <div class="logo">☀</div>
     <div>
-      <div class="title">Aditya-L1 Solar Flare Forecaster</div>
+      <div class="title">Solar Flare Detection System - L1</div>
       <div class="subtitle">SIH 2026: Forecasting and/or Nowcasting of Solar Flares using combined Soft and Hard X-ray data from Aditya-L1 PS:26209</div>
     </div>
   </div>
@@ -279,7 +279,7 @@
 
       <h2 class="guide-h2">How is it different from existing ideas?</h2>
       <p class="guide-p">
-        Most operational flare tools share two limitations: they rely on a <b>single channel</b> (usually soft X-rays) and on <b>Earth-orbit data</b>, and most "predictions" are really detections. Solar Flare Forecaster differs on three concrete axes:
+        Most operational flare tools share two limitations: they rely on a <b>single channel</b> (usually soft X-rays) and on <b>Earth-orbit data</b>, and most "predictions" are really detections. Solar Flare Detection System - L1 differs on three concrete axes:
       </p>
 
       <div class="diff-grid">
@@ -747,7 +747,7 @@
       </div>
 
       <div class="guide-foot-note">
-        Solar Flare Forecaster · SIH 2026: Forecasting and/or Nowcasting of Solar Flares using combined Soft and Hard X-ray data from Aditya-L1 PS:26209. Real SoLEXS sample: 2026-06-15 SDD2, parsed from the downloaded day-file. Instrument figures verified against the published SoLEXS and HEL1OS papers (<i>Solar Physics</i>, 2025) and the Neupert-effect literature. The animated Neupert and reconnection figures are physically-faithful schematics, labelled as such.
+        Solar Flare Detection System - L1 · SIH 2026: Forecasting and/or Nowcasting of Solar Flares using combined Soft and Hard X-ray data from Aditya-L1 PS:26209. Real SoLEXS sample: 2026-06-15 SDD2, parsed from the downloaded day-file. Instrument figures verified against the published SoLEXS and HEL1OS papers (<i>Solar Physics</i>, 2025) and the Neupert-effect literature. The animated Neupert and reconnection figures are physically-faithful schematics, labelled as such.
       </div>
     </div>
   </div>
@@ -755,6 +755,7 @@
 
 <footer class="footer">
   <span>Replay of <b>real model outputs</b> on held-out Aditya-L1 data; forecasts are <b>calibrated probabilities</b>, not certainties.</span>
+  <span class="visitor-count-wrap">Visitor count: <span id="visitorOdometer" class="odometer" aria-live="polite">0</span></span>
 </footer>
 
 <div id="errBar" class="errbar"></div>
@@ -763,5 +764,6 @@
 <script src="/js/performance.js"></script>
 <script src="/js/operations.js"></script>
 <script src="/js/catalog.js"></script>
+<script src="/js/visitor.js"></script>
 </body>
 </html>
