@@ -45,8 +45,8 @@ async function loadDay(date){
 }
 
 function buildChart(){
-  const traces=DETS.map(dd=>({type:'scattergl',mode:'lines',name:dd.label,x:[],y:[],
-    line:{color:dd.color,width:1.9},connectgaps:false,hoverinfo:'name+y'}));
+  const traces=DETS.map(dd=>({type:'scatter',mode:'lines',name:dd.label,x:[],y:[],
+    line:{color:dd.color,width:1.8},connectgaps:false,hoverinfo:'name+y'}));
   Plotly.react('opsChart',traces,layout(),{displayModeBar:false,responsive:true});
 }
 function layout(){

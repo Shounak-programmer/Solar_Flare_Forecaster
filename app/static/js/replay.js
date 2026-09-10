@@ -25,7 +25,7 @@ async function init(){
   catch(e){ showError('Cannot load demo days: '+e.message); return; }
   S = {manifest};
   const sel = el('daySelect');
-  const roleLabel = {showstopper:'⭐ Showstopper', allclear:'🎯 Quiet→X (all-clear)',
+  const roleLabel = {showstopper:'Showstopper', allclear:'Quiet→X (all-clear)',
                      famous:'Famous flare', anchor:'Anchor', quiet:'Quiet day', gti_miss:'Coverage-gap miss',
                      xclass:'X-class flare', mclass:'M-class flare'};
   const splitTag = {TEST:' [TEST — held-out]', VAL:' [VAL — tuning]', TRAIN:' [TRAIN — in-sample]'};
@@ -91,8 +91,8 @@ function pretty(date){ return `${date.slice(0,4)}-${date.slice(4,6)}-${date.slic
 // ── chart ────────────────────────────────────────────────────────────────
 function buildChart(){
   const traces = DETS.map(dd=>({
-    type:'scattergl', mode:'lines', name:dd.label, x:[], y:[],
-    line:{color:dd.color, width:1.9}, connectgaps:false, hoverinfo:'name+y',
+    type:'scatter', mode:'lines', name:dd.label, x:[], y:[],
+    line:{color:dd.color, width:1.8}, connectgaps:false, hoverinfo:'name+y',
   }));
   const layout = baseLayout();
   Plotly.react('mainChart', traces, layout, {displayModeBar:false, responsive:true});
@@ -188,6 +188,9 @@ function updateForecast(){
   const imp = IMPACT[alert] || IMPACT.quiet;
   el('impactText').innerHTML = `<span class="pill">${imp.pill}</span>${imp.text}`;
   updateLead();
+  try {
+    window.dispatchEvent(new CustomEvent('suryasetu_prediction_update', { detail: { prob_15: p15, alert } }));
+  } catch(e) {}
 }
 
 // lead-time callout: live countdown to the next upcoming flagged flare, then a won badge

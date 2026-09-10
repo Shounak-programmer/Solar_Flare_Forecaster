@@ -1,7 +1,7 @@
 // Performance tab — reliability, skill-vs-baselines, feature importance, per-class, all-clear.
 (function(){
 let rendered = false;
-const NAVY='#1a3a5c', ORANGE='#d35400', GREY='#a7b6c6', GREEN='#2e8b74';
+const NAVY='#0284c7', ORANGE='#d97706', GREY='#64748b', GREEN='#15803d';
 const PL = {displayModeBar:false, responsive:true};
 const base = plotLayout({margin:{l:54,r:16,t:14,b:46},
               xaxis:plotAxis(), yaxis:plotAxis()});
@@ -26,15 +26,15 @@ function reliability(m){
   const clean = o => { const p=[],q=[]; o.pred.forEach((x,i)=>{ if(x!=null&&o.obs[i]!=null){p.push(x);q.push(o.obs[i]);} }); return {p,q}; };
   const b=clean(m.reliability.before), a=clean(m.reliability.after);
   const traces=[
-    {x:[0,1],y:[0,1],mode:'lines',line:{color:'#aab6c4',dash:'dash',width:1},name:'perfect',hoverinfo:'skip'},
-    {x:b.p,y:b.q,mode:'lines+markers',line:{color:ORANGE,width:2},marker:{size:7},name:'XGBoost (uncalibrated)'},
-    {x:a.p,y:a.q,mode:'lines+markers',line:{color:GREEN,width:2},marker:{size:7,symbol:'square'},name:'XGBoost + isotonic'},
+    {x:[0,1],y:[0,1],mode:'lines',line:{color:'#94a3b8',dash:'dash',width:1},name:'perfect',hoverinfo:'skip'},
+    {x:b.p,y:b.q,mode:'lines+markers',line:{color:ORANGE,width:2},marker:{size:6},name:'XGBoost (uncalibrated)'},
+    {x:a.p,y:a.q,mode:'lines+markers',line:{color:GREEN,width:2},marker:{size:6,symbol:'square'},name:'XGBoost + isotonic'},
   ];
   Plotly.react('relChart', traces, Object.assign({}, base, {
     xaxis:plotAxis({title:axisTitle('predicted probability'),range:[0,1]}),
     yaxis:plotAxis({title:axisTitle('observed frequency'),range:[0,1]}),
-    legend:{x:.03,y:.97,font:{size:11},bgcolor:'rgba(255,255,255,.82)',
-            bordercolor:'#e4e9f0',borderwidth:1}}), PL);
+    legend:{x:.03,y:.97,font:{size:10.5,color:'#0f172a'},bgcolor:'rgba(255, 255, 255, 0.95)',
+            bordercolor:'#cbd5e1',borderwidth:1}}), PL);
   const c=m.calibration.y_15min;
   document.getElementById('relCap').innerHTML =
     `Isotonic calibration pulls the curve onto the diagonal. <b>ECE ${c.ece_before.toFixed(3)} → ${c.ece_after.toFixed(3)}</b>, `+
@@ -45,18 +45,18 @@ function reliability(m){
 function tssBars(m){
   const H=['y_15min','y_30min','y_60min'], xl=['15 min','30 min','60 min'];
   const mk=(name,src,color)=>({type:'bar',name,x:xl,y:H.map(h=>src[h]),marker:{color},
-    text:H.map(h=>src[h].toFixed(2)),textposition:'outside',textfont:{size:11,color:'#43566a'},
+    text:H.map(h=>src[h].toFixed(2)),textposition:'outside',textfont:{size:11,color:'#475569'},
     cliponaxis:false});
   const traces=[
     mk('Climatology', m.baselines.climatology, GREY),
-    mk('Persistence', m.baselines.persistence, '#c98a12'),
+    mk('Persistence', m.baselines.persistence, '#b45309'),
     mk('XGBoost (calibrated)', m.forecast_tss, NAVY),
   ];
   Plotly.react('tssChart', traces, Object.assign({}, base, {
     barmode:'group', bargap:.32, bargroupgap:.12,
     xaxis:plotAxis({title:axisTitle('forecast horizon',11.5)}),
     yaxis:plotAxis({title:axisTitle('TSS'),range:[0,0.46]}),
-    legend:{orientation:'h',y:1.16,x:0,font:{size:11}}}), PL);
+    legend:{orientation:'h',y:1.16,x:0,font:{size:11,color:'#475569'}}}), PL);
   document.getElementById('tssCap').innerHTML =
     `<div class="nowcast-badge"><span>NOWCASTING (separate task)</span> Detection TSS `+
     `<b>${m.detection.tss}</b> — concurrent detection, not prediction. Off this axis (much easier than forecasting).</div>`+
@@ -70,11 +70,11 @@ function importance(m){
   const traces=[{type:'bar',orientation:'h',x:f.map(d=>d.gain),y:f.map(d=>d.name),
     marker:{color:f.map(d=>d.physics?ORANGE:NAVY)},
     text:f.map(d=>d.physics?'physics':''),textposition:'inside',insidetextanchor:'start',
-    textfont:{size:10,color:'#fff'},hoverinfo:'x+y'}];
+    textfont:{size:10,color:'#ffffff'},hoverinfo:'x+y'}];
   Plotly.react('impChart', traces, Object.assign({}, base, {
     margin:{l:150,r:16,t:12,b:44},
     xaxis:plotAxis({title:axisTitle('XGBoost gain')}),
-    yaxis:plotAxis({automargin:true,tickfont:{size:10.5,color:'#5a6b7d'}})}), PL);
+    yaxis:plotAxis({automargin:true,tickfont:{size:10.5,color:'#475569'}})}), PL);
 }
 
 // ── per-class table ──────────────────────────────────────────────────────

@@ -11,7 +11,7 @@ async function fetchJSON(path){
 
 function showError(msg){
   const bar = document.getElementById('errBar');
-  bar.textContent = '⚠ ' + msg;
+  bar.textContent = 'SYSTEM NOTIFICATION: ' + msg;
   bar.style.display = 'block';
   clearTimeout(showError._t);
   showError._t = setTimeout(()=>{ bar.style.display='none'; }, 6000);
@@ -42,58 +42,83 @@ function isoNaive(unix){
 }
 
 // ── shared Plotly theme ─────────────────────────────────────────────────────
-// One visual language for every chart in the app: consistent fonts, muted grid,
-// visible axis lines/ticks, projector-legible sizing. Used across all tabs.
-const PLOT_FONT   = {family:'"Segoe UI", Inter, system-ui, sans-serif', size:12.5, color:'#3a4a5c'};
-const PLOT_GRID   = '#e8edf3';
-const PLOT_AXIS   = '#c6d0dc';   // axis + tick colour
-const PLOT_TICK   = {size:11.5, color:'#5a6b7d'};
-// Detector colour family: soft→hard, cohesive (no default plotly blue).
-const DET_COLORS  = {solexs_sdd2:'#1a3a5c', hel1os_cdte1:'#2e8b74',
-                     hel1os_cdte2:'#4d7ba6', hel1os_czt1:'#d35400', hel1os_czt2:'#9c4a1e'};
-function axisTitle(text, size){ return {text, font:{size:size||12.5, color:'#43566a'}, standoff:10}; }
+// Clean scientific mission console theme: high contrast light background, subtle grids,
+// crisp aerospace telemetry traces.
+const PLOT_FONT   = {family:'"Inter", -apple-system, system-ui, sans-serif', size:11.5, color:'#475569'};
+const PLOT_GRID   = 'rgba(0, 0, 0, 0.07)';
+const PLOT_AXIS   = 'rgba(0, 0, 0, 0.20)';   // axis + tick colour
+const PLOT_TICK   = {size:11, color:'#64748b'};
+// Coherent scientific trace palette (aerospace telemetry on light backgrounds):
+// SoLEXS SDD2 (sky blue), HEL1OS CdTe1 (teal), HEL1OS CdTe2 (indigo),
+// HEL1OS CZT1 (warm amber), HEL1OS CZT2 (rose red).
+const DET_COLORS  = {
+  solexs_sdd2:  '#0284c7',
+  hel1os_cdte1: '#0d9488',
+  hel1os_cdte2: '#6366f1',
+  hel1os_czt1:  '#d97706',
+  hel1os_czt2:  '#e11d48'
+};
+function axisTitle(text, size){ return {text, font:{size:size||11.5, color:'#475569'}, standoff:10}; }
 // Base axis object; pass overrides (title, type, range, tickformat…).
 function plotAxis(extra){
-  return Object.assign({gridcolor:PLOT_GRID, linecolor:PLOT_AXIS, zerolinecolor:'#d7dfe8',
+  return Object.assign({gridcolor:PLOT_GRID, linecolor:PLOT_AXIS, zerolinecolor:'rgba(0, 0, 0, 0.12)',
     ticks:'outside', tickcolor:PLOT_AXIS, ticklen:4, tickfont:PLOT_TICK,
     showline:true, mirror:false}, extra||{});
 }
 // Base layout; merge with chart-specific xaxis/yaxis/legend.
 function plotLayout(extra){
-  return Object.assign({paper_bgcolor:'#ffffff', plot_bgcolor:'#ffffff', font:PLOT_FONT,
+  return Object.assign({paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'#ffffff', font:PLOT_FONT,
     autosize:true,
-    hoverlabel:{font:{family:PLOT_FONT.family,size:12}, bgcolor:'#12293f', bordercolor:'#12293f',
+    hoverlabel:{font:{family:PLOT_FONT.family,size:11.5,color:'#0f172a'}, bgcolor:'#ffffff', bordercolor:'#cbd5e1',
                 align:'left'},
     margin:{l:56,r:16,t:14,b:44}}, extra||{});
 }
 
-// Resize every VISIBLE Plotly chart to fill its container. Plotly's own
-// responsive:true does not reliably fire on programmatic viewport changes
-// (projector / screenshot tooling), so we drive it explicitly on resize and
-// on tab switch — guarantees charts fill their card rather than rendering tiny.
+// Resize every VISIBLE Plotly chart to fill its container.
+// Uses getBoundingClientRect & offsetWidth for reliable visibility checks across
+// Apple Safari / WebKit (where offsetParent can return null for SVG/transformed elements).
 function resizeAllPlots(){
   if(!window.Plotly) return;
-  document.querySelectorAll('.js-plotly-plot').forEach(d=>{
-    if(d.offsetParent !== null){ try{ Plotly.Plots.resize(d); }catch(e){} }
+  document.querySelectorAll('.js-plotly-plot, .chart').forEach(d=>{
+    const hasSize = (d.offsetWidth > 0 || d.offsetHeight > 0 ||
+      (d.getBoundingClientRect && d.getBoundingClientRect().width > 0));
+    if(hasSize && d.classList.contains('js-plotly-plot')){
+      try { Plotly.Plots.resize(d); } catch(e){}
+    }
   });
 }
-// Resize across a couple of animation frames + a delayed retry so it lands
-// AFTER the browser has reflowed a newly-shown pane (grid columns settle late).
+
+// Multi-stage resize scheduler: fires on next frame, +120ms (post-reflow),
+// and +350ms (post CSS transition/animation) to guarantee Apple Safari/WebKit
+// and mobile devices render full-width charts.
 function resizeAllPlotsSoon(){
   requestAnimationFrame(()=>requestAnimationFrame(resizeAllPlots));
-  setTimeout(resizeAllPlots, 250);
+  setTimeout(resizeAllPlots, 120);
+  setTimeout(resizeAllPlots, 350);
 }
+
 let _resizeTimer;
-window.addEventListener('resize', ()=>{ clearTimeout(_resizeTimer);
-  _resizeTimer = setTimeout(resizeAllPlotsSoon, 100); });
-// After a tab becomes visible its charts have a real width — size them then.
-window.addEventListener('tabchange', resizeAllPlotsSoon);
-// Most robust path: watch the panes themselves. A ResizeObserver fires whenever a
-// pane's box actually changes size — catching projector/emulated viewport changes
-// that never dispatch a window 'resize' event. Observing the pane (not the plot)
-// avoids a feedback loop, since resizing the inner plot doesn't change the pane.
-if(window.ResizeObserver){
-  const _ro = new ResizeObserver(()=>{ clearTimeout(_resizeTimer);
-    _resizeTimer = setTimeout(resizeAllPlots, 80); });
-  document.querySelectorAll('.tabpane').forEach(p=>_ro.observe(p));
+window.addEventListener('resize', ()=>{
+  clearTimeout(_resizeTimer);
+  _resizeTimer = setTimeout(resizeAllPlotsSoon, 60);
+});
+
+// Orientation change on phones and tablets
+window.addEventListener('orientationchange', ()=>{
+  setTimeout(resizeAllPlotsSoon, 150);
+});
+
+// Tab visibility changes
+window.addEventListener('tabchange', ()=>{
+  resizeAllPlotsSoon();
+  setTimeout(resizeAllPlots, 500);
+});
+
+// Robust ResizeObserver: observes both the tabpanes and individual chart cards
+if(typeof window.ResizeObserver !== 'undefined'){
+  const _ro = new ResizeObserver(()=>{
+    clearTimeout(_resizeTimer);
+    _resizeTimer = setTimeout(resizeAllPlots, 50);
+  });
+  document.querySelectorAll('.tabpane, .chart-card, .chart, .perf-grid, .ops-grid').forEach(p=>_ro.observe(p));
 }

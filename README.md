@@ -363,6 +363,11 @@ python scripts/19_defensibility.py
 - **Mitra Sarkar** — *3rd Year* · UI/UX design, physics animations & visual presentation.
 - **Shounak Chatterjee** — *B.Tech, 3rd Year* · Fullstack development, FastAPI backend & deployment engineering.
 
+#### **Research Team** · *Adamas University*
+- **Arnab Kar** — *Adamas University* · Solar physics foundations, literature survey & scientific validation.
+- **Bidisha** — *Adamas University* · Space weather data analysis & astrophysical research.
+- **Tanisha** — *Adamas University* · Instrument research, PRADAN data investigation & mission analysis.
+
 ### Acknowledgements
 Developed for the **ISRO Bharatiya Antariksh Hackathon 2026** (Problem Statement **PS-15**). We gratefully acknowledge the **Indian Space Research Organisation (ISRO)**, the **Aditya-L1 Mission Team**, and the **SoLEXS / HEL1OS Payload Teams** at URSC and PRL whose ground calibration and in-flight performance publications directly enabled this work.
 

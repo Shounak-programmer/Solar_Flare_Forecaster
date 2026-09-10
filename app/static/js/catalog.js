@@ -38,9 +38,9 @@ async function init(){
 async function hardness(){
   const h=await fetchJSON('/api/hardness');
   const d=h.detectors;
-  const colors=d.map(x=>x.band==='soft'?'#1a3a5c':(x.name.includes('CdTe')?'#2e8b74':'#d35400'));
+  const colors=d.map(x=>x.band==='soft'?'#0284c7':(x.name.includes('CdTe')?'#0d9488':'#d97706'));
   const traces=[{type:'bar',x:d.map(x=>x.name),y:d.map(x=>x.xc_ratio),marker:{color:colors},
-    text:d.map(x=>x.xc_ratio+'×'),textposition:'outside',textfont:{size:12,color:'#43566a'},
+    text:d.map(x=>x.xc_ratio+'×'),textposition:'outside',textfont:{size:11.5,color:'#475569'},
     cliponaxis:false,
     customdata:d.map(x=>[Math.round(x.x_recall*100),Math.round(x.c_recall*100)]),
     hovertemplate:'%{x}<br>X-recall %{customdata[0]}%, C-recall %{customdata[1]}%<extra></extra>'}];
