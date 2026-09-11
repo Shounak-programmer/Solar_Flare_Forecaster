@@ -1,6 +1,7 @@
 """MongoDB connection layer and data access helpers for SuryaSetu."""
 from __future__ import annotations
 
+import json
 import logging
 import os
 from typing import Any, Optional
@@ -20,12 +21,41 @@ MONGODB_DATABASE = os.environ.get("MONGODB_DATABASE", "suryasetu").strip()
 
 _client = None
 _db = None
+_warned_placeholder = False
+
+_COUNTER_FILE = Path(__file__).resolve().parents[1] / "dashboard_data" / "visitor_count.json"
+
+
+def _read_standalone_count() -> int:
+    """Reads the persisted visitor count from local disk fallback."""
+    try:
+        if _COUNTER_FILE.exists():
+            data = json.loads(_COUNTER_FILE.read_text(encoding="utf-8"))
+            return max(0, int(data.get("count", 0)))
+    except Exception as exc:
+        logger.debug(f"Could not read local visitor count file: {exc}")
+    return getattr(increment_visitor_count, "_standalone_count", 0)
+
+
+def _write_standalone_count(val: int) -> None:
+    """Persists the visitor count to local disk fallback."""
+    increment_visitor_count._standalone_count = val
+    try:
+        _COUNTER_FILE.parent.mkdir(parents=True, exist_ok=True)
+        _COUNTER_FILE.write_text(json.dumps({"count": val}), encoding="utf-8")
+    except Exception as exc:
+        logger.debug(f"Could not write local visitor count file: {exc}")
 
 
 def get_mongo_client():
     """Returns the MongoClient instance or None if not configured."""
-    global _client
+    global _client, _warned_placeholder
     if not MONGODB_URI:
+        return None
+    if "<db_password>" in MONGODB_URI or "<password>" in MONGODB_URI:
+        if not _warned_placeholder:
+            logger.info("MONGODB_URI contains a password placeholder (<db_password>). Running in persistent standalone mode.")
+            _warned_placeholder = True
         return None
     if _client is None:
         try:
@@ -134,15 +164,13 @@ def insert_alert(record: dict[str, Any]) -> bool:
 def increment_visitor_count() -> int:
     """Atomically increments the global visitor counter and returns the new count.
     Uses upsert so the document is created automatically on first visit.
-    Falls back to an in-memory counter when MongoDB is unavailable.
+    Falls back to persistent local storage when MongoDB is unavailable.
     """
     db = get_database()
     if db is None:
-        # Standalone fallback — keep an in-memory counter
-        increment_visitor_count._standalone_count = getattr(
-            increment_visitor_count, "_standalone_count", 0
-        ) + 1
-        return increment_visitor_count._standalone_count
+        count = _read_standalone_count() + 1
+        _write_standalone_count(count)
+        return count
     try:
         from pymongo import ReturnDocument
         result = db.site_stats.find_one_and_update(
@@ -151,20 +179,27 @@ def increment_visitor_count() -> int:
             upsert=True,
             return_document=ReturnDocument.AFTER,
         )
-        return int(result.get("count", 1))
+        new_count = int(result.get("count", 1))
+        _write_standalone_count(new_count)
+        return new_count
     except Exception as e:
-        logger.error(f"Error incrementing visitor count: {e}")
-        return -1
+        logger.error(f"Error incrementing visitor count in MongoDB: {e}. Falling back to local storage.")
+        count = _read_standalone_count() + 1
+        _write_standalone_count(count)
+        return count
 
 
 def get_visitor_count() -> int:
     """Returns the current visitor count without incrementing it."""
     db = get_database()
     if db is None:
-        return getattr(increment_visitor_count, "_standalone_count", 0)
+        return _read_standalone_count()
     try:
         doc = db.site_stats.find_one({"_id": "visitor_counter"})
-        return int(doc["count"]) if doc else 0
+        count = int(doc["count"]) if doc and "count" in doc else _read_standalone_count()
+        _write_standalone_count(count)
+        return count
     except Exception as e:
-        logger.error(f"Error fetching visitor count: {e}")
-        return -1
+        logger.error(f"Error fetching visitor count from MongoDB: {e}. Falling back to local storage.")
+        return _read_standalone_count()
+
