@@ -1,0 +1,265 @@
+/* ============================================================================
+   SURYASETU Mobile Portrait Optimisations
+   All rules scoped inside max-width media queries.
+   Desktop styles are NEVER touched here.
+   ============================================================================ */
+
+/* ==========================================================================
+   SECTION 1 - Header / Navigation
+   ========================================================================== */
+@media (max-width: 767px) {
+  .sub-detail { display: none; }
+  .topbar { padding: 0.45rem 0.75rem 0.25rem; gap: 0.30rem; }
+  .brand { padding: 0.15rem 0; gap: 0.55rem; }
+  .title { font-size: 0.88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .subtitle { font-size: 0.60rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tabs {
+    overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; white-space: nowrap; padding: 0.15rem 0 0.30rem;
+    gap: 0.20rem; border-top: 1px solid var(--border-subtle);
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { flex: 0 0 auto; padding: 0.30rem 0.60rem; font-size: 0.70rem; letter-spacing: 0.4px; }
+}
+
+/* ==========================================================================
+   SECTION 2 - Tab pane base
+   ========================================================================== */
+@media (max-width: 767px) {
+  .tabpane { padding: 0.70rem 0.65rem 6rem; width: 100%; max-width: 100vw; overflow-x: clip; box-sizing: border-box; }
+}
+
+/* ==========================================================================
+   SECTION 3 - Replay Tab
+   ========================================================================== */
+@media (max-width: 767px) {
+  .daybar { flex-direction: column; align-items: stretch; gap: 0.45rem; padding: 0.60rem 0.70rem; width: 100%; box-sizing: border-box; }
+  .dayselect { flex-direction: column; align-items: stretch; gap: 0.20rem; width: 100%; }
+  #daySelect { width: 100% !important; max-width: 100% !important; min-width: 0 !important; box-sizing: border-box; font-size: 0.80rem; }
+  .daymeta { font-size: 0.72rem; word-break: break-word; line-height: 1.4; }
+  .badge { align-self: flex-start; margin-left: 0; }
+
+  .alert-banner { display: flex; flex-wrap: wrap; gap: 0.40rem; padding: 0.50rem 0.70rem; }
+  .alert-state  { order: 1; flex: 0 0 auto; font-size: 0.74rem; }
+  .alert-clock  { order: 2; margin-left: auto; flex: 0 0 auto; font-size: 0.80rem; }
+  .alert-desc   { order: 3; flex: 1 1 100%; width: 100%; font-size: 0.78rem; line-height: 1.35; margin-top: 0.10rem; }
+
+  .main-grid { flex-direction: column; gap: 0.65rem; width: 100%; min-width: 0; }
+  .forecast-card { flex: 1 1 100%; width: 100%; max-width: 100%; min-width: 0; }
+  .risk-big { font-size: clamp(2.1rem, 9vw, 2.7rem); }
+  .risk-secondary { grid-template-columns: 1fr 1fr; gap: 0.45rem; }
+  .chart-card { flex: 1 1 100%; width: 100%; max-width: 100%; min-width: 0; overflow: hidden; }
+  .chart { height: 300px; width: 100% !important; max-width: 100% !important; min-width: 0 !important; }
+
+  .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 0.40rem; padding: 0.55rem 0.65rem; }
+  #playBtn, #restartBtn { flex: 1 1 calc(50% - 0.25rem); min-width: 0; text-align: center; padding: 0.42rem 0.5rem; font-size: 0.76rem; }
+  .speeds { flex: 1 1 100%; display: flex; justify-content: space-between; margin-left: 0; padding: 0.22rem 0.45rem; order: 3; }
+  .spd { flex: 1; text-align: center; padding: 0.28rem 0.35rem; font-size: 0.70rem; }
+  .scrubber { flex: 1 1 calc(100% - 88px); min-width: 0; order: 4; }
+  .scrub-label { flex: 0 0 78px; order: 5; text-align: center; }
+
+  .impact-card { padding: 0.75rem 0.85rem; }
+  .impact-text { font-size: 0.82rem; line-height: 1.50; }
+}
+
+/* ==========================================================================
+   SECTION 4 - Performance Tab
+   ========================================================================== */
+@media (max-width: 767px) {
+  .spec-k { font-size: 0.58rem; }
+  .spec-v { font-size: 0.72rem; }
+  .perf-spec-strip { grid-template-columns: repeat(2, 1fr); gap: 0.45rem; padding: 0.40rem; }
+  .perf-grid { grid-template-columns: 1fr; gap: 0.65rem; }
+  .chart.sm { height: 300px; }
+  .perf-lead { font-size: 0.82rem; line-height: 1.55; }
+}
+
+/* ==========================================================================
+   SECTION 5 - Operations Tab
+   ========================================================================== */
+@media (max-width: 767px) {
+  .ops-statusbar { flex-direction: column; align-items: stretch; gap: 0.45rem; padding: 0.60rem 0.70rem; }
+  .ops-select { flex-direction: column; align-items: stretch; gap: 0.20rem; }
+  #opsDaySelect { width: 100% !important; max-width: 100% !important; min-width: 0 !important; font-size: 0.80rem; }
+  .ops-now { justify-content: space-between; width: 100%; }
+  .ops-status { margin-left: 0; width: 100%; flex-wrap: wrap; gap: 0.30rem; }
+  .ops-grid { grid-template-columns: 1fr; gap: 0.65rem; width: 100%; min-width: 0; }
+  .ops-chart-card .chart { height: 280px; width: 100% !important; }
+  .ctx-list li { font-size: 0.77rem; gap: 0.50rem; padding: 0.40rem 0; }
+  .ctx-list b { font-size: 0.88rem; }
+  .ops-controls { flex-wrap: wrap; gap: 0.40rem; }
+  .ops-controls .scrubber { flex: 1 1 calc(100% - 126px); }
+  .ops-controls .scrub-label { flex: 0 0 76px; }
+}
+
+/* ==========================================================================
+   SECTION 6 - Catalog Tab
+   ========================================================================== */
+@media (max-width: 767px) {
+  .cat-subnav {
+    overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; white-space: nowrap; flex-wrap: nowrap;
+    padding: 0.30rem 0.40rem 0.40rem; gap: 0.25rem;
+    -webkit-mask-image: linear-gradient(to right, transparent 0, black 8px, black calc(100% - 8px), transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0, black 8px, black calc(100% - 8px), transparent 100%);
+  }
+  .cat-subnav::-webkit-scrollbar { display: none; }
+  .cat-subtab { flex: 0 0 auto; font-size: 0.70rem; padding: 0.30rem 0.60rem; gap: 0.30rem; white-space: nowrap; letter-spacing: 0.2px; }
+  .cat-subtab .subtab-icon { width: 13px; height: 13px; flex-shrink: 0; }
+  .cat-filters { flex-direction: column; align-items: stretch; gap: 0.40rem; }
+  .cat-filters label { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+  .cat-filters select { flex: 1 1 auto; max-width: 62%; }
+  .cat-pager { margin-left: 0; width: 100%; justify-content: space-between; }
+  .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .table-responsive > table { min-width: 480px; }
+  .qpp-gallery { grid-template-columns: 1fr; }
+  .qpp-tiers { gap: 0.60rem; }
+  .qpp-tier { flex: 1 1 100%; }
+  .qpp-card .wv { height: 200px; }
+}
+
+/* ==========================================================================
+   SECTION 7 - In-Depth Guide / Arrival Animation
+   ========================================================================== */
+@media (max-width: 767px) {
+  .guide-page { padding: 0.25rem 0 1.2rem; }
+  .guide-title { font-size: clamp(1.25rem, 5.5vw, 1.65rem); line-height: 1.2; word-break: break-word; }
+  .guide-subtitle { font-size: 0.82rem; line-height: 1.45; }
+  .guide-h2 { font-size: 1.0rem; margin: 1.2rem 0 0.55rem; }
+  .guide-p { font-size: 0.83rem; line-height: 1.60; margin-bottom: 0.90rem; }
+
+  .arrival-card { margin: 1rem 0 1.5rem; border-radius: 8px; }
+  .arrival-card-head { flex-direction: column; align-items: flex-start; gap: 0.35rem; padding: 0.65rem 1rem; }
+  .arrival-card-title { font-size: 0.68rem; letter-spacing: 1px; }
+  .arrival-card-badge { font-size: 0.60rem; }
+
+  .arrival-stage { padding: 1.6rem 0.75rem; min-height: 220px; }
+  .arrival-sun-wrap   { width: 64px;  height: 64px;  flex-shrink: 0; }
+  .arrival-sun-sphere { width: 56px;  height: 56px; }
+  .arrival-sun-label  { font-size: 0.72rem; letter-spacing: 1px; }
+  .arrival-earth-wrap   { width: 52px;  height: 52px;  flex-shrink: 0; }
+  .arrival-earth-sphere { width: 46px;  height: 46px; }
+  .arrival-earth-label  { font-size: 0.62rem; }
+  .arrival-tracks-wrap  { margin: 0 0.60rem; gap: 1.6rem; }
+  .arrival-track-meta { font-size: 0.74rem; }
+  .arrival-track-name { font-size: 0.72rem; }
+  .arrival-track-eta  { font-size: 0.68rem; }
+  .aditya-marker-title { font-size: 0.64rem; bottom: 13px; }
+  .aditya-marker-sub   { font-size: 0.58rem; top: 14px; }
+  .arrival-card-foot   { padding: 0.75rem 1rem; font-size: 0.80rem; }
+
+  .arrival-waves-grid { grid-template-columns: 1fr; gap: 0.75rem; margin-bottom: 1.4rem; }
+  .arrival-wave-card  { padding: 0.90rem 1rem; }
+  .wave-title { font-size: 0.86rem; }
+  .wave-desc  { font-size: 0.79rem; }
+
+  .breaks-grid { grid-template-columns: 1fr; gap: 0.75rem; margin-bottom: 1.2rem; }
+  .break-card  { padding: 0.90rem 1rem; }
+  .break-title { font-size: 0.86rem; }
+  .break-p     { font-size: 0.79rem; }
+}
+
+/* ==========================================================================
+   SECTION 8 - Opportunity & USP
+   ========================================================================== */
+@media (max-width: 767px) {
+  .diff-grid { grid-template-columns: 1fr; gap: 0.65rem; margin: 0.65rem 0 1rem; }
+  .diff-card  { padding: 0.90rem 1rem; }
+  .diff-card h3 { font-size: 0.84rem; }
+  .diff-card p  { font-size: 0.79rem; }
+  .usp-highlight { padding: 0.90rem 1rem; margin: 1rem 0; }
+  .usp-hl-text   { font-size: 0.86rem; line-height: 1.55; }
+}
+
+/* ==========================================================================
+   SECTION 9 - Architecture / Flow SVG diagrams
+   ========================================================================== */
+@media (max-width: 767px) {
+  .diagram-card { padding: 0.85rem 0.80rem; margin: 0.65rem 0 1rem; overflow: hidden; }
+  .flow-svg-wrap {
+    overflow-x: auto; -webkit-overflow-scrolling: touch; justify-content: flex-start;
+    scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent; padding-bottom: 0.5rem;
+  }
+  .flow-svg-wrap > svg { min-width: 480px; width: 100%; max-width: none; }
+  .diagram-caption { font-size: 0.70rem; }
+  .diagram-header  { font-size: 0.62rem; letter-spacing: 0.8px; }
+}
+
+/* ==========================================================================
+   SECTION 10 - Cost & Team
+   ========================================================================== */
+@media (max-width: 767px) {
+  .cost-stat-grid { grid-template-columns: repeat(2, 1fr); gap: 0.60rem; margin: 0.85rem 0 1.15rem; }
+  .cost-stat-val  { font-size: 1.20rem; }
+  .cost-stat-lbl  { font-size: 0.64rem; }
+  .team-cover-box { padding: 0.90rem; }
+  .team-cover-meta { flex-direction: column; gap: 0.55rem; }
+  .team-cover-field-val { font-size: 0.90rem; }
+  .team-cover-grid { grid-template-columns: 1fr; gap: 0.65rem; }
+  .team-member-cover-card { padding: 0.80rem 0.90rem; }
+  .team-member-cover-name { font-size: 0.92rem; }
+  .team-member-cover-role { font-size: 0.75rem; }
+  .cost-table { font-size: 0.76rem; }
+  .cost-table th { padding: 0.45rem 0.65rem; font-size: 0.65rem; }
+  .cost-table td { padding: 0.45rem 0.65rem; }
+  .cost-table td.cost-zero { font-size: 0.82rem; }
+  .guide-foot-note { font-size: 0.67rem; line-height: 1.50; }
+}
+
+/* ==========================================================================
+   SECTION 11 - Footer
+   ========================================================================== */
+@media (max-width: 767px) {
+  .footer { flex-direction: column; align-items: center; gap: 0.25rem; padding: 0.40rem 0.75rem; text-align: center; font-size: 0.64rem; line-height: 1.45; }
+  .visitor-count-wrap { margin: 0 auto; }
+}
+
+/* ==========================================================================
+   SECTION 12 - Ultra-Compact phones (<=480px)
+   ========================================================================== */
+@media (max-width: 480px) {
+  .topbar   { padding: 0.35rem 0.55rem 0.20rem; }
+  .title    { font-size: 0.82rem; }
+  .subtitle { font-size: 0.56rem; }
+  .tab      { padding: 0.28rem 0.48rem; font-size: 0.66rem; }
+  .card     { padding: 0.65rem 0.70rem; }
+  .tabpane  { padding: 0.55rem 0.50rem 6rem; }
+  .risk-big { font-size: clamp(1.9rem, 11vw, 2.5rem); }
+  .chart    { height: 260px; }
+  .chart.sm { height: 240px; }
+  .perf-spec-strip { grid-template-columns: 1fr; gap: 0.30rem; }
+  .spec-cell { border-right: none; border-bottom: 1px solid var(--border-subtle); padding: 0.18rem 0.25rem; }
+  .spec-cell:last-child { border-bottom: none; }
+  .cost-stat-grid { grid-template-columns: 1fr; gap: 0.50rem; }
+  .breaks-grid    { grid-template-columns: 1fr; }
+  .arrival-stage  { padding: 1.4rem 0.60rem; min-height: 200px; }
+  .arrival-tracks-wrap { margin: 0 0.50rem; gap: 1.4rem; }
+  .arrival-sun-wrap   { width: 54px; height: 54px; }
+  .arrival-sun-sphere { width: 48px; height: 48px; }
+  .arrival-sun-label  { font-size: 0.66rem; }
+  .arrival-earth-wrap   { width: 44px; height: 44px; }
+  .arrival-earth-sphere { width: 38px; height: 38px; }
+  .arrival-earth-label  { font-size: 0.58rem; }
+  .arrival-track-name { font-size: 0.68rem; }
+  .arrival-track-eta  { font-size: 0.62rem; }
+  .guide-title { font-size: clamp(1.15rem, 5vw, 1.45rem); }
+  .footer { font-size: 0.60rem; }
+}
+
+/* ==========================================================================
+   SECTION 13 - Suryasetu 3D viewport height fix
+   ========================================================================== */
+@media (max-width: 767px) {
+  .suryasetu-viewport-container { height: calc(100svh - 110px); min-height: 420px; }
+}
+
+/* ==========================================================================
+   SECTION 14 - General overflow safety net
+   ========================================================================== */
+@media (max-width: 767px) {
+  * { max-width: 100%; }
+  .flow-svg-wrap, .table-responsive, .cat-subnav, .tabs, .qpp-gallery { max-width: none; }
+  .js-plotly-plot, .plot-container { width: 100% !important; max-width: 100% !important; overflow: hidden !important; }
+  .card { width: 100%; max-width: 100%; box-sizing: border-box; }
+  .row { flex-wrap: wrap; gap: 0.60rem; margin-bottom: 0.65rem; }
+}
