@@ -1,6 +1,6 @@
 /**
  * HUD & Mission Control Overlay for SURYASETU
- * 
+  
  * Professional aerospace mission-control styling:
  * - Restrained typography and high legibility
  * - System status, telemetry telemetry cards, measurement tables
